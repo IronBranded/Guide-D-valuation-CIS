@@ -21,7 +21,7 @@ Aucune installation requise.  /  No installation required.
 
 <h3 align="center">
   <a href="https://ironbranded.github.io/Guide-PME-CIS/" target="_blank" rel="noopener noreferrer">
-    🟢 TRY THE GUIDE / ESSAYER LE GUIDE 🟢
+    🟢 ESSAYER LE GUIDE / TRY THE GUIDE 🟢
   </a>
 </h3>
 
