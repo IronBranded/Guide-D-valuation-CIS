@@ -35,9 +35,13 @@ One HTML file. No server. No data transmitted. Open in a browser and start.
 
 ## 🚀 Démarrage rapide / Quick Start
 
-Aucune installation requise. Aucun `npm install`. Aucun build step.
+Aucune installation requise.  /  No installation required.
 
-No installation required. No `npm install`. No build step.
+<h3 align="center">
+  <a href="https://ironbranded.github.io/Guide-PME-CIS/" target="_blank" rel="noopener noreferrer">
+    🟢 TRY THE GUIDE / ESSAYER LE GUIDE 🟢
+  </a>
+</h3>
 
 ---
 
