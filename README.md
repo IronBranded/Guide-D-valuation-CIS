@@ -1,5 +1,5 @@
 # 🔐 Guide d'Évaluation des Contrôles de Sécurité — PME Québec
-### Security Controls Assessment Guide · CIS Controls v8.1 + AI · Bilingual FR/EN
+### Security Controls Assessment Guide · CIS Controls v8.1 · Bilingual FR/EN
 
 > Outil d'évaluation de la maturité cybersécurité autonome, bilingue et gratuit pour les PME québécoises — fondé sur les CIS Controls v8.1, la Loi 25 et le cadre PDRP.
 >
