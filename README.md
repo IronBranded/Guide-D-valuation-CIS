@@ -35,17 +35,6 @@ One HTML file. No server. No data transmitted. Open in a browser and start.
 
 ## 🚀 Démarrage rapide / Quick Start
 
-```bash
-# Cloner / Clone
-git clone https://github.com/votre-org/guide-cis-pme.git
-cd guide-cis-pme
-
-# Ouvrir directement / Open directly
-open guide-cis-pme.html          # macOS
-start guide-cis-pme.html         # Windows
-xdg-open guide-cis-pme.html      # Linux
-```
-
 Aucune installation requise. Aucun `npm install`. Aucun build step.
 
 No installation required. No `npm install`. No build step.
