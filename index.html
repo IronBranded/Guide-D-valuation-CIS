@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide d'Évaluation des PMEs — Contrôle CIS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────────────── */
+:root {
+  --navy:     #0f1f3d;
+  --navy2:    #162847;
+  --navy-l:   #1e3560;
+  --slate:    #4a5568;
+  --slate2:   #718096;
+  --slate3:   #a0aec0;
+  --rule:     #e2e8f0;
+  --rule2:    #edf2f7;
+  --bg:       #f4f6f9;
+  --bg2:      #edf0f5;
+  --surface:  #ffffff;
+  --ink:      #1a202c;
+  --ink2:     #2d3748;
+
+  --protect:  #1a56db;
+  --detect:   #6c2bd9;
+  --respond:  #057a55;
+  --culture:  #b45309;
+
+  --c-red:    #c53030;
+  --c-orange: #c05621;
+  --c-yellow: #b7791f;
+  --c-green:  #276749;
+  --c-blue:   #2b6cb0;
+
+  --sidebar-w: 268px;
+  --header-h:  56px;
+
+  --font-serif: 'DM Serif Display', Georgia, serif;
+  --font-sans:  'DM Sans', system-ui, sans-serif;
+  --font-mono:  'JetBrains Mono', monospace;
+
+  --sh: 0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2: 0 4px 16px rgba(0,0,0,.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ─────────────────────────────────────────────
+   LOADING SCREEN
+───────────────────────────────────────────── */
+#loading {
+  position: fixed; inset: 0; 
+  background: radial-gradient(circle at center, var(--navy-l), var(--navy));
+  z-index: 9999; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  transition: opacity .55s ease, visibility .55s ease;
+}
+#loading::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+#loading.out { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.ld-mark {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 52px;
+  opacity: 0; transform: translateY(8px);
+  animation: rise .6s .15s ease forwards;
+  z-index: 1;
+}
+.ld-box {
+  width: 54px; height: 54px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--protect), var(--detect));
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 15px; font-weight: 600;
+  color: #fff; letter-spacing: .04em;
+}
+.ld-name { font-family: var(--font-serif); font-size: 24px; color: #fff; line-height: 1.2; }
+.ld-name small {
+  display: block; font-family: var(--font-mono); font-size: 11px;
+  color: rgba(255,255,255,.5); letter-spacing: .1em; margin-top: 2px;
+  font-style: normal;
+}
+
+.ld-body {
+  text-align: center; z-index: 1;
+  opacity: 0; transform: translateY(8px);
+  animation: rise .6s .3s ease forwards;
+}
+.ld-h1 {
+  font-family: var(--font-serif); font-size: clamp(32px,5vw,52px);
+  color: #fff; line-height: 1.15; margin-bottom: 24px; letter-spacing: -.01em;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.ld-h1 em { font-style: italic; color: rgba(255,255,255,.45); }
+.ld-sub {
+  font-family: var(--font-mono); font-size: 11px;
+  color: rgba(255,255,255,.35); letter-spacing: .1em; margin-bottom: 44px;
+}
+.ld-track {
+  width: 280px; height: 4px; background: rgba(255,255,255,.1);
+  border-radius: 4px; overflow: hidden; margin: 0 auto 16px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+}
+.ld-bar {
+  height: 100%; background: linear-gradient(90deg, var(--protect), #fff);
+  border-radius: 4px; width: 0; transition: width .35s ease;
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+.ld-msg {
+  font-family: var(--font-mono); font-size: 11px;
+  color: rgba(255,255,255,.3); letter-spacing: .06em; min-height: 18px;
+}
+.ld-enter {
+  margin-top: 40px; padding: 14px 40px;
+  background: #fff; border: none;
+  color: var(--navy); font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  letter-spacing: .1em; border-radius: 30px; cursor: pointer;
+  opacity: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ld-enter.show { animation: rise .45s ease forwards; }
+.ld-enter:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,255,255,0.3); }
+.ld-enter:active { transform: translateY(0); }
+
+.ld-stats {
+  display: flex; gap: 48px; margin-top: 50px; padding: 24px 48px;
+  background: rgba(255, 255, 255, 0.03); border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2); z-index: 1;
+  opacity: 0; animation: rise .55s .7s ease forwards;
+}
+.ld-stat { text-align: center; }
+.ld-stat-n { font-family: var(--font-serif); font-size: 32px; color: #fff; line-height: 1; }
+.ld-stat-l { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,.4); letter-spacing: .1em; margin-top: 6px; }
+
+@keyframes rise { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+
+/* ─────────────────────────────────────────────
+   APP SHELL
+───────────────────────────────────────────── */
+#app { opacity: 0; transition: opacity .45s ease; }
+#app.show { opacity: 1; }
+
+/* TOP BAR */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--header-h);
+  background: var(--surface); border-bottom: 1px solid var(--rule);
+  z-index: 300; display: flex; align-items: center;
+  padding: 0 20px 0 24px; gap: 16px; box-shadow: var(--sh);
+}
+.tb-mark {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.tb-box {
+  width: 30px; height: 30px; background: var(--navy); border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 9px; font-weight: 500;
+  color: rgba(255,255,255,.8); letter-spacing: .02em; flex-shrink: 0;
+}
+.tb-title { font-weight: 600; font-size: 13px; color: var(--navy); }
+.tb-sep { width: 1px; height: 18px; background: var(--rule); flex-shrink: 0; }
+.tb-doc { font-family: var(--font-mono); font-size: 10.5px; color: var(--slate3); letter-spacing: .03em; }
+.tb-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+.prog-wrap { display: flex; align-items: center; gap: 8px; }
+.prog-txt { font-family: var(--font-mono); font-size: 11px; color: var(--slate2); white-space: nowrap; }
+.prog-rail { width: 90px; height: 3px; background: var(--rule); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--navy); border-radius: 3px; width: 0; transition: width .3s ease; }
+
+.lang-sw { display: flex; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+.lang-btn {
+  padding: 5px 11px; font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
+  background: transparent; border: none; color: var(--slate2); cursor: pointer;
+  letter-spacing: .06em; transition: all .15s;
+}
+.lang-btn.on { background: var(--navy); color: #fff; }
+
+.tb-icon-btn {
+  width: 32px; height: 32px; border-radius: 5px; border: 1px solid var(--rule);
+  background: transparent; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--slate2); transition: all .15s; flex-shrink: 0;
+}
+.tb-icon-btn:hover { border-color: var(--navy); color: var(--navy); }
+.tb-icon-btn.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+/* PRINT TOGGLE PANEL */
+.print-panel {
+  position: fixed; top: calc(var(--header-h) + 8px); right: 16px;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 8px;
+  padding: 16px 18px; min-width: 220px; z-index: 400; box-shadow: var(--sh2);
+  display: none;
+}
+.print-panel.show { display: block; }
+.pp-title {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--slate3); margin-bottom: 12px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--rule2);
+}
+.pp-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.pp-row:last-child { margin-bottom: 0; }
+.pp-label { font-size: 12.5px; color: var(--ink2); }
+.toggle-sw {
+  width: 34px; height: 18px; background: var(--rule); border-radius: 20px;
+  position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0;
+}
+.toggle-sw.on { background: var(--navy); }
+.toggle-knob {
+  width: 14px; height: 14px; background: #fff; border-radius: 50%;
+  position: absolute; top: 2px; left: 2px; transition: transform .2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.toggle-sw.on .toggle-knob { transform: translateX(16px); }
+.pp-print-btn {
+  width: 100%; margin-top: 14px; padding: 9px; background: var(--navy);
+  color: #fff; border: none; border-radius: 5px; font-family: var(--font-sans);
+  font-size: 12.5px; font-weight: 500; cursor: pointer; transition: background .15s;
+}
+.pp-print-btn:hover { background: var(--navy2); }
+
+/* ─────────────────────────────────────────────
+   MAIN LAYOUT
+───────────────────────────────────────────── */
+.layout {
+  margin-top: var(--header-h);
+  display: flex; min-height: calc(100vh - var(--header-h));
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: var(--surface); border-right: 1px solid var(--rule);
+  position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h));
+  overflow-y: auto; overflow-x: hidden;
+  display: flex; flex-direction: column;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+
+.sb-section-label {
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--slate3); padding: 16px 16px 6px;
+}
+
+.sb-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px 8px 16px; cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: background .12s, border-color .12s;
+  text-decoration: none; position: relative;
+}
+.sb-item:hover { background: var(--bg); }
+.sb-item.active { background: #ebf0fb; border-left-color: var(--navy); }
+
+.sb-num {
+  font-family: var(--font-mono); font-size: 10px; color: var(--slate3);
+  flex-shrink: 0; width: 20px;
+}
+.sb-icon { font-size: 13px; flex-shrink: 0; }
+.sb-info { flex: 1; min-width: 0; }
+.sb-name { font-size: 12px; font-weight: 500; color: var(--ink2); line-height: 1.3; }
+.sb-item.active .sb-name { color: var(--navy); }
+.sb-sub { font-family: var(--font-mono); font-size: 9.5px; color: var(--slate3); margin-top: 1px; }
+
+.sb-check {
+  width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--rule);
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.sb-check.partial { border-color: var(--c-yellow); background: #fffff0; }
+.sb-check.done { border-color: var(--c-green); background: var(--c-green); }
+.sb-check.done::after { content: ''; width: 4px; height: 7px; border: 1.5px solid #fff; border-top: none; border-left: none; transform: rotate(45deg) translateY(-1px); display: block; }
+
+.sb-divider { height: 1px; background: var(--rule2); margin: 4px 0; }
+
+.sb-report-btn {
+  margin: 12px 14px; padding: 10px 16px;
+  background: var(--navy); color: #fff; border: none; border-radius: 5px;
+  font-family: var(--font-sans); font-size: 12.5px; font-weight: 500;
+  cursor: pointer; transition: background .15s; width: calc(100% - 28px);
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.sb-report-btn:hover { background: var(--navy2); }
+
+/* MAIN CONTENT */
+.main {
+  flex: 1; min-width: 0;
+  padding: 32px 36px 80px;
+  max-width: 760px;
+}
+@media (max-width: 900px) { .main { padding: 24px 20px 80px; } }
+
+/* ─────────────────────────────────────────────
+   PAGES
+───────────────────────────────────────────── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ─────────────────────────────────────────────
+   COVER PAGE
+───────────────────────────────────────────── */
+.cover-banner {
+  background: var(--navy); border-radius: 8px; padding: 36px 40px;
+  margin-bottom: 24px; position: relative; overflow: hidden;
+}
+.cover-banner::after {
+  content: ''; position: absolute; right: -50px; top: -50px;
+  width: 220px; height: 220px;
+  border: 1px solid rgba(255,255,255,.05); border-radius: 50%;
+}
+.cv-eye {
+  font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,.3);
+  letter-spacing: .12em; text-transform: uppercase; margin-bottom: 12px;
+}
+.cv-h1 {
+  font-family: var(--font-serif); font-size: clamp(22px,3vw,30px);
+  color: #fff; line-height: 1.18; margin-bottom: 10px;
+}
+.cv-h1 em { font-style: italic; color: rgba(255,255,255,.45); }
+.cv-desc { font-size: 13px; color: rgba(255,255,255,.45); max-width: 480px; line-height: 1.65; }
+.cv-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 20px; }
+.cv-tag {
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .07em;
+  padding: 3px 9px; border-radius: 3px;
+  border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.4);
+}
+
+.pillar-row {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  border: 1px solid var(--rule); border-radius: 8px;
+  overflow: hidden; background: var(--surface); margin-bottom: 28px;
+  box-shadow: var(--sh);
+}
+.pillar-cell {
+  padding: 14px 16px; display: flex; align-items: center; gap: 8px;
+  border-right: 1px solid var(--rule); font-size: 12.5px;
+}
+.pillar-cell:last-child { border-right: none; }
+.pc-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.pc-name { font-weight: 500; }
+
+/* ─────────────────────────────────────────────
+   ORG INFO CARD
+───────────────────────────────────────────── */
+.card {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 8px; margin-bottom: 20px; overflow: hidden; box-shadow: var(--sh);
+}
+.card-head {
+  padding: 14px 20px; border-bottom: 1px solid var(--rule2);
+  display: flex; align-items: center; gap: 10px;
+}
+.card-head-icon { font-size: 14px; }
+.card-head-title {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--slate2); font-weight: 500;
+}
+.card-body { padding: 20px; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+@media (max-width: 600px) {
+  .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
+}
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field.full { grid-column: 1/-1; }
+.field label { font-size: 11.5px; font-weight: 500; color: var(--slate); }
+.field input, .field select, .field textarea {
+  background: var(--bg); border: 1px solid var(--rule); border-radius: 5px;
+  padding: 8px 11px; color: var(--ink); font-family: var(--font-sans); font-size: 13.5px;
+  outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--navy); box-shadow: 0 0 0 3px rgba(15,31,61,.07); background: #fff;
+}
+.field select option { background: var(--bg); }
+.field textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+
+.insurance-row {
+  display: flex; gap: 8px; margin-top: 2px;
+}
+.ins-opt {
+  flex: 1; padding: 8px 10px; border: 1.5px solid var(--rule);
+  border-radius: 5px; cursor: pointer; text-align: center;
+  font-size: 12.5px; font-weight: 500; color: var(--slate2);
+  transition: all .15s; background: var(--bg); user-select: none;
+}
+.ins-opt:hover { border-color: #c9d4e4; color: var(--ink2); }
+.ins-opt.sel-yes { border-color: var(--respond); background: #e6f9f2; color: var(--respond); }
+.ins-opt.sel-no  { border-color: var(--c-red);   background: #fff5f5; color: var(--c-red); }
+.ins-opt.sel-unk { border-color: var(--slate3);  background: #f7fafc; color: var(--slate); }
+
+/* ─────────────────────────────────────────────
+   CONTROL PAGE
+───────────────────────────────────────────── */
+.ctrl-header {
+  display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px;
+  padding-bottom: 20px; border-bottom: 1px solid var(--rule);
+}
+.ctrl-icon-wrap {
+  width: 48px; height: 48px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.ctrl-meta { flex: 1; }
+.ctrl-eyebrow {
+  font-family: var(--font-mono); font-size: 10px; color: var(--slate3);
+  letter-spacing: .08em; margin-bottom: 4px;
+}
+.ctrl-title { font-family: var(--font-serif); font-size: 22px; color: var(--ink); line-height: 1.25; margin-bottom: 6px; }
+.ctrl-sub { font-size: 12.5px; color: var(--slate2); line-height: 1.5; }
+.ctrl-pills { display: flex; gap: 5px; margin-top: 7px; }
+.cp {
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 500;
+  letter-spacing: .06em; padding: 2px 8px; border-radius: 3px;
+}
+.cp-p { background:#ebf3ff; color:var(--protect); }
+.cp-d { background:#f3ebff; color:var(--detect); }
+.cp-r { background:#e6f9f2; color:var(--respond); }
+.cp-c { background:#fef3e2; color:var(--culture); }
+
+.ctrl-progress {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 22px; padding: 12px 16px;
+  background: var(--bg2); border-radius: 6px;
+}
+.cp-label { font-family: var(--font-mono); font-size: 10.5px; color: var(--slate2); flex: 1; }
+.cp-pips { display: flex; gap: 4px; }
+.cp-pip {
+  width: 20px; height: 5px; border-radius: 3px; background: var(--rule);
+  transition: background .2s;
+}
+.cp-pip.done { background: var(--navy); }
+.cp-pip.partial { background: var(--c-yellow); }
+
+/* QUESTION ACCORDION */
+.q-accordion { margin-bottom: 8px; border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; background: var(--surface); }
+.q-acc-head {
+  padding: 14px 18px; display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: background .12s; user-select: none;
+}
+.q-acc-head:hover { background: var(--bg); }
+.q-acc-head.open { background: var(--bg); border-bottom: 1px solid var(--rule2); }
+
+.q-acc-num {
+  font-family: var(--font-mono); font-size: 10px; color: var(--slate3); flex-shrink: 0; width: 32px;
+}
+.q-acc-text { flex: 1; font-size: 13.5px; font-weight: 400; color: var(--ink2); line-height: 1.5; }
+.q-acc-status {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.q-score-tag {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  padding: 2px 8px; border-radius: 3px; white-space: nowrap; display: none;
+}
+.q-pillars { display: flex; gap: 3px; }
+.q-pdot { width: 5px; height: 5px; border-radius: 50%; }
+.q-chevron { color: var(--slate3); font-size: 10px; transition: transform .22s; }
+.q-acc-head.open .q-chevron { transform: rotate(180deg); }
+
+.q-acc-body { display: none; padding: 16px 18px 18px; }
+.q-acc-body.open { display: block; }
+
+.q-ref-line {
+  font-family: var(--font-mono); font-size: 10px; color: var(--slate3);
+  letter-spacing: .04em; margin-bottom: 14px;
+}
+
+/* SCALE OPTIONS */
+.scale-opts { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.s-opt {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 13px; border: 1px solid var(--rule); border-radius: 5px;
+  cursor: pointer; transition: all .12s; background: var(--bg);
+}
+.s-opt:hover { border-color: #c9d4e4; background: #f0f4fa; }
+.s-opt.s0.sel { border-color:#e53e3e; background:#fff5f5; }
+.s-opt.s1.sel { border-color:#dd6b20; background:#fffaf0; }
+.s-opt.s2.sel { border-color:#d69e2e; background:#fffff0; }
+.s-opt.s3.sel { border-color:#38a169; background:#f0fff4; }
+.s-opt.s4.sel { border-color:#2b6cb0; background:#ebf8ff; }
+.s-opt.sna.sel{ border-color:#a0aec0; background:#f7fafc; }
+
+.s-bullet {
+  width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--rule);
+  flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center;
+  transition: all .12s;
+}
+.s0.sel .s-bullet { border-color:#e53e3e; background:#e53e3e; }
+.s1.sel .s-bullet { border-color:#dd6b20; background:#dd6b20; }
+.s2.sel .s-bullet { border-color:#d69e2e; background:#d69e2e; }
+.s3.sel .s-bullet { border-color:#38a169; background:#38a169; }
+.s4.sel .s-bullet { border-color:#2b6cb0; background:#2b6cb0; }
+.sna.sel .s-bullet { border-color:#a0aec0; background:#a0aec0; }
+.s-inner { width: 5px; height: 5px; border-radius: 50%; background:#fff; opacity:0; transition:opacity .1s; }
+.s-opt.sel .s-inner { opacity: 1; }
+
+.s-badge {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  width: 16px; flex-shrink: 0; color: var(--slate3); text-align: center; padding-top: 1px;
+}
+.s0.sel .s-badge { color:#e53e3e; }
+.s1.sel .s-badge { color:#dd6b20; }
+.s2.sel .s-badge { color:#d69e2e; }
+.s3.sel .s-badge { color:#38a169; }
+.s4.sel .s-badge { color:#2b6cb0; }
+.sna.sel .s-badge { color:#a0aec0; }
+.s-label { font-size: 12.5px; color: var(--slate2); line-height: 1.4; flex: 1; }
+.s0.sel .s-label { color:#c53030; }
+.s1.sel .s-label { color:#c05621; }
+.s2.sel .s-label { color:#b7791f; }
+.s3.sel .s-label { color:#276749; }
+.s4.sel .s-label { color:#2b6cb0; }
+.sna.sel .s-label { color:var(--slate3); }
+
+.q-note-label { font-size: 11.5px; font-weight: 500; color: var(--slate); margin-bottom: 5px; }
+.q-note-ta {
+  width: 100%; background: var(--bg); border: 1px solid var(--rule2);
+  border-radius: 5px; padding: 8px 11px; font-family: var(--font-sans); font-size: 12.5px;
+  color: var(--slate); resize: vertical; min-height: 52px; outline: none;
+  transition: border-color .15s; line-height: 1.5;
+}
+.q-note-ta:focus { border-color: var(--navy); background: #fff; }
+.q-note-ta::placeholder { color: var(--slate3); }
+
+.ctrl-nav {
+  display: flex; gap: 10px; margin-top: 28px; padding-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+.ctrl-nav-btn {
+  flex: 1; padding: 10px 16px; border-radius: 5px; font-family: var(--font-sans);
+  font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--rule);
+  background: var(--surface); color: var(--slate); transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.ctrl-nav-btn:hover { border-color: var(--navy); color: var(--navy); }
+.ctrl-nav-btn.primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+.ctrl-nav-btn.primary:hover { background: var(--navy2); }
+
+/* ─────────────────────────────────────────────
+   REPORT PAGE
+───────────────────────────────────────────── */
+.rpt-banner {
+  background: var(--navy); border-radius: 8px; padding: 32px 36px;
+  margin-bottom: 20px; position: relative; overflow: hidden;
+}
+.rpt-banner::after {
+  content: ''; position: absolute; right: -50px; top: -50px;
+  width: 220px; height: 220px; border: 1px solid rgba(255,255,255,.05); border-radius: 50%;
+}
+.rpt-eye { font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,.3); letter-spacing: .12em; margin-bottom: 10px; }
+.rpt-h1 { font-family: var(--font-serif); font-size: 26px; color: #fff; margin-bottom: 6px; }
+.rpt-meta { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,.35); letter-spacing: .04em; }
+.rpt-pill {
+  display: inline-flex; align-items: center; gap: 7px; margin-top: 16px;
+  padding: 7px 16px; border-radius: 4px; font-family: var(--font-mono);
+  font-size: 12px; font-weight: 500; letter-spacing: .04em; border: 1px solid;
+}
+
+.rpt-grid {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;
+  background: var(--surface); margin-bottom: 20px; box-shadow: var(--sh);
+}
+@media (max-width: 600px) { .rpt-grid { grid-template-columns: repeat(2,1fr); } }
+.rpt-cell { padding: 20px 20px; border-right: 1px solid var(--rule); }
+.rpt-cell:last-child { border-right: none; }
+.rpt-cell-label { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+.rpt-cell-val { font-family: var(--font-serif); font-size: 30px; line-height: 1; margin-bottom: 8px; }
+.rpt-cell-bar { height: 3px; background: var(--rule); border-radius: 3px; overflow: hidden; margin-bottom: 5px; }
+.rpt-cell-fill { height: 100%; border-radius: 3px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+.rpt-cell-lv { font-size: 11.5px; font-weight: 500; }
+
+.findings-card {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: var(--sh);
+}
+.fc-head {
+  padding: 13px 20px; border-bottom: 1px solid var(--rule);
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--slate3);
+}
+.fc-row {
+  display: flex; gap: 12px; padding: 13px 20px;
+  border-bottom: 1px solid var(--rule2); align-items: flex-start;
+}
+.fc-row:last-child { border-bottom: none; }
+.fc-badge {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+  letter-spacing: .07em; padding: 3px 7px; border-radius: 3px;
+  flex-shrink: 0; margin-top: 2px; white-space: nowrap; border: 1px solid;
+}
+.fc-text { font-size: 13px; color: var(--ink2); line-height: 1.55; }
+
+.rpt-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.rpt-btn {
+  padding: 10px 20px; border-radius: 5px; font-family: var(--font-sans);
+  font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--rule);
+  background: var(--surface); color: var(--ink2); transition: all .15s;
+}
+.rpt-btn:hover { border-color: var(--navy); color: var(--navy); }
+.rpt-btn.prim { background: var(--navy); color: #fff; border-color: var(--navy); }
+.rpt-btn.prim:hover { background: var(--navy2); }
+
+/* ─────────────────────────────────────────────
+   PRINT STYLES
+───────────────────────────────────────────── */
+@media print {
+  #loading, .topbar, .sidebar, .ctrl-nav,
+  .sb-report-btn, .rpt-actions, .print-panel { display: none !important; }
+
+  body { background: #fff !important; font-size: 11pt; }
+  .layout { display: block !important; }
+  .main { max-width: 100% !important; padding: 0 !important; }
+
+  .page { display: none !important; }
+  .page.active { display: block !important; }
+
+  /* When print-all mode is on, show all pages */
+  body.print-all .page { display: block !important; page-break-before: auto; }
+  body.print-all .page:not(:first-child) { page-break-before: always; }
+
+  .q-acc-body { display: block !important; }
+  .q-acc-head { cursor: default; }
+  .cover-banner, .rpt-banner, .ctrl-icon-wrap { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .card, .q-accordion, .findings-card { box-shadow: none !important; }
+  @page { margin: 15mm 18mm; }
+
+  /* Print show/hide toggles */
+  body.print-hide-notes .q-note-ta { display: none !important; }
+  body.print-hide-notes .q-note-label { display: none !important; }
+  body.print-hide-scale .scale-opts { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOADING ═══════════ -->
+<div id="loading">
+  <div class="ld-mark">
+    <div class="ld-box">CIS</div>
+    <div class="ld-name" id="ls-name">Guide d'Évaluation des PMEs
+      <small id="ls-sub">PME QUÉBEC · CONTRÔLE CIS v8.1 + IA</small>
+    </div>
+  </div>
+  <div class="ld-body">
+    <div class="ld-h1" id="ls-h1">Guide d'Évaluation<br><em>des PMEs — Contrôle CIS</em></div>
+    <div class="ld-sub" id="ls-sub2">CONTRÔLE CIS v8.1 · IA · LOI 25 · CADRE PDRP</div>
+    <div class="ld-track"><div class="ld-bar" id="ld-bar"></div></div>
+    <div class="ld-msg" id="ld-msg"></div>
+    <button class="ld-enter" id="ld-enter" onclick="enterApp()">
+      <span id="ls-enter-txt">OUVRIR LE GUIDE →</span>
+    </button>
+  </div>
+  <div class="ld-stats">
+    <div class="ld-stat"><div class="ld-stat-n">19</div><div class="ld-stat-l" id="ls-s1">DOMAINES</div></div>
+    <div class="ld-stat"><div class="ld-stat-n">95</div><div class="ld-stat-l" id="ls-s2">QUESTIONS</div></div>
+    <div class="ld-stat"><div class="ld-stat-n">4</div><div class="ld-stat-l" id="ls-s3">PILIERS</div></div>
+  </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div id="app">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-mark">
+    <div class="tb-box">CIS</div>
+    <span class="tb-title" id="tb-title">Guide d'Évaluation des PMEs</span>
+  </div>
+  <div class="tb-sep"></div>
+  <span class="tb-doc" id="tb-doc">PME Québec · Contrôle CIS v8.1 + IA · Loi 25</span>
+  <div class="tb-right">
+    <div class="prog-wrap">
+      <span class="prog-txt" id="prog-txt">0%</span>
+      <div class="prog-rail"><div class="prog-fill" id="prog-fill"></div></div>
+    </div>
+    <!-- Print toggle button -->
+    <div class="tb-icon-btn" id="print-toggle-btn" onclick="togglePrintPanel()" title="Options d'impression">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M4 1.5h8A1.5 1.5 0 0113.5 3v3H2.5V3A1.5 1.5 0 014 1.5zM2 7h12a1 1 0 011 1v4.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 12.5V8a1 1 0 011-1zm2 2v3h8V9H4zm8-5.5a.5.5 0 100 1 .5.5 0 000-1z"/>
+      </svg>
+    </div>
+    <div class="lang-sw">
+      <button class="lang-btn on" id="btn-fr" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT PANEL -->
+<div class="print-panel" id="print-panel">
+  <div class="pp-title" id="pp-title">Options d'impression</div>
+  <div class="pp-row">
+    <span class="pp-label" id="pp-all-lbl">Imprimer tous les contrôles</span>
+    <div class="toggle-sw" id="tog-all" onclick="toggleOpt('all')"><div class="toggle-knob"></div></div>
+  </div>
+  <div class="pp-row">
+    <span class="pp-label" id="pp-notes-lbl">Inclure les notes</span>
+    <div class="toggle-sw on" id="tog-notes" onclick="toggleOpt('notes')"><div class="toggle-knob"></div></div>
+  </div>
+  <div class="pp-row">
+    <span class="pp-label" id="pp-scale-lbl">Inclure les options de réponse</span>
+    <div class="toggle-sw on" id="tog-scale" onclick="toggleOpt('scale')"><div class="toggle-knob"></div></div>
+  </div>
+  <button class="pp-print-btn" id="pp-btn" onclick="doPrint()">🖨 Imprimer / Exporter PDF</button>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sb-section-label" id="sb-lbl-nav">Navigation</div>
+    <div class="sb-item" onclick="goPage('cover')" id="sb-cover">
+      <span class="sb-num">—</span>
+      <span class="sb-icon">🏠</span>
+      <div class="sb-info">
+        <div class="sb-name" id="sb-home-lbl">Accueil & Info</div>
+      </div>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-section-label" id="sb-lbl-ctrl">Contrôles CIS</div>
+    <div id="sb-controls"></div>
+    <div class="sb-divider"></div>
+    <button class="sb-report-btn" onclick="goPage('report')" id="sb-rpt-btn">
+      <span>→</span> <span id="sb-rpt-lbl">Générer le rapport</span>
+    </button>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main" id="main-content">
+
+    <!-- ── COVER PAGE ── -->
+    <div class="page active" id="page-cover">
+      <div class="cover-banner">
+        <div class="cv-eye" id="cv-eye">GUIDE D'ÉVALUATION · PME QUÉBEC · CONFIDENTIEL</div>
+        <div class="cv-h1" id="cv-h1">Guide d'Évaluation des PMEs<br><em>Contrôle CIS v8.1</em></div>
+        <div class="cv-desc" id="cv-desc">Guide d'évaluation fondé sur les 18 Contrôles CIS v8.1 + sécurité IA, adapté aux PME québécoises. Conçu pour l'auditeur ou l'organisation elle-même.</div>
+        <div class="cv-tags">
+          <span class="cv-tag">CIS Controls v8.1</span>
+          <span class="cv-tag" id="cv-t1">Loi 25 · Vie privée</span>
+          <span class="cv-tag" id="cv-t2">Sécurité IA</span>
+          <span class="cv-tag" id="cv-t3">Cadre PDRP</span>
+          <span class="cv-tag" id="cv-t4">PME Québec</span>
+        </div>
+      </div>
+
+      <div class="pillar-row">
+        <div class="pillar-cell"><div class="pc-dot" style="background:var(--protect)"></div><span class="pc-name" id="pl1" style="color:var(--protect)">Protéger</span></div>
+        <div class="pillar-cell"><div class="pc-dot" style="background:var(--detect)"></div><span class="pc-name" id="pl2" style="color:var(--detect)">Détecter</span></div>
+        <div class="pillar-cell"><div class="pc-dot" style="background:var(--respond)"></div><span class="pc-name" id="pl3" style="color:var(--respond)">Répondre</span></div>
+        <div class="pillar-cell" style="border-right:none"><div class="pc-dot" style="background:var(--culture)"></div><span class="pc-name" id="pl4" style="color:var(--culture)">Culture & Gouvernance</span></div>
+      </div>
+
+      <!-- ORG INFO -->
+      <div class="card">
+        <div class="card-head"><span class="card-head-icon">🏢</span><span class="card-head-title" id="ch-org">Informations sur l'organisation</span></div>
+        <div class="card-body">
+          <div class="form-grid" style="margin-bottom:14px">
+            <div class="field"><label id="lbl-org">Nom de l'organisation</label><input type="text" id="f-org" placeholder="Acme inc."></div>
+            <div class="field"><label id="lbl-sec">Secteur d'activité</label>
+              <select id="f-sec">
+                <option value="">—</option>
+                <option>Fabrication / Manufacturing</option>
+                <option>Services professionnels</option>
+                <option>Commerce de détail / Retail</option>
+                <option>Santé / Clinique</option>
+                <option>Construction / Immobilier</option>
+                <option>Finance / Comptabilité</option>
+                <option>Technologies de l'information</option>
+                <option>OBNL / Organisme communautaire</option>
+                <option>Juridique / Notariat</option>
+                <option>Autre</option>
+              </select>
+            </div>
+            <div class="field"><label id="lbl-size">Nombre d'employés</label>
+              <select id="f-size">
+                <option value="">—</option>
+                <option>1–10</option><option>11–50</option><option>51–250</option><option>251+</option>
+              </select>
+            </div>
+            <div class="field"><label id="lbl-infra">Infrastructure principale</label>
+              <select id="f-infra">
+                <option value="">—</option>
+                <option id="inf1">Sur site (on-premises)</option>
+                <option id="inf2">Infonuagique (cloud)</option>
+                <option id="inf3">Hybride</option>
+                <option id="inf4">Géré par un tiers / MSSP</option>
+              </select>
+            </div>
+            <div class="field"><label id="lbl-date">Date de l'évaluation</label><input type="date" id="f-date"></div>
+            <div class="field"><label id="lbl-aud">Évaluateur / Auditeur</label><input type="text" id="f-aud" placeholder="Nom complet"></div>
+            <div class="field"><label id="lbl-rprp">Resp. protection données (Loi 25)</label><input type="text" id="f-rprp" placeholder="Nom du responsable"></div>
+            <div class="field"><label id="lbl-ref">No. de référence / dossier</label><input type="text" id="f-ref" placeholder="EV-2025-001"></div>
+            <div class="field full"><label id="lbl-scope">Portée / périmètre de l'évaluation</label><textarea id="f-scope" placeholder="Systèmes, sites, départements couverts…"></textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CYBER INSURANCE -->
+      <div class="card">
+        <div class="card-head"><span class="card-head-icon">🛡</span><span class="card-head-title" id="ch-ins">Assurance cybersécurité</span></div>
+        <div class="card-body">
+          <div class="field" style="margin-bottom:14px">
+            <label id="lbl-ins">L'organisation dispose-t-elle d'une assurance cybersécurité?</label>
+            <div class="insurance-row" id="ins-row">
+              <div class="ins-opt" id="ins-yes" onclick="setIns('yes')"><span id="ins-yes-lbl">✓ Oui</span></div>
+              <div class="ins-opt" id="ins-no"  onclick="setIns('no')"><span id="ins-no-lbl">✗ Non</span></div>
+              <div class="ins-opt" id="ins-unk" onclick="setIns('unk')"><span id="ins-unk-lbl">? Inconnu</span></div>
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom:14px">
+            <div class="field"><label id="lbl-insurer">Assureur / courtier</label><input type="text" id="f-insurer" placeholder="Nom de l'assureur"></div>
+            <div class="field"><label id="lbl-coverage">Couverture (montant / type)</label><input type="text" id="f-coverage" placeholder="ex. 1 M$ · tout risque cyber"></div>
+            <div class="field"><label id="lbl-policy">Numéro de police</label><input type="text" id="f-policy" placeholder="Numéro de police"></div>
+            <div class="field"><label id="lbl-renewal">Date de renouvellement</label><input type="date" id="f-renewal"></div>
+            <div class="field"><label id="lbl-deductible">Franchise / Déductible</label><input type="text" id="f-deductible" placeholder="ex. 10 000 $"></div>
+            <div class="field"><label id="lbl-notif">Délai de notification à l'assureur</label><input type="text" id="f-notif" placeholder="ex. 24h après détection"></div>
+          </div>
+          <div class="form-grid">
+            <div class="field full"><label id="lbl-ins-notes">Notes / conditions particulières de la police</label><textarea id="f-ins-notes" placeholder="Exclusions, conditions, obligations de sécurité contractuelles…"></textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMERGENCY CONTACTS -->
+      <div class="card">
+        <div class="card-head"><span class="card-head-icon">🚨</span><span class="card-head-title" id="ch-emerg">Contacts d'urgence</span></div>
+        <div class="card-body">
+          <div id="emerg-contacts"></div>
+          <button onclick="addEmergContact()" id="add-contact-btn" style="margin-top:10px;padding:7px 14px;background:transparent;border:1px dashed var(--rule);border-radius:5px;font-family:var(--font-sans);font-size:12.5px;color:var(--slate2);cursor:pointer;transition:all .15s;width:100%">
+            + <span id="add-contact-lbl">Ajouter un contact d'urgence</span>
+          </button>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;display:flex;justify-content:flex-end">
+        <button class="ctrl-nav-btn primary" onclick="goPage('ctrl-c01')" style="max-width:220px" id="start-btn">
+          Commencer l'évaluation →
+        </button>
+      </div>
+    </div><!-- /cover page -->
+
+    <!-- ── CONTROL PAGES (rendered by JS) ── -->
+    <div id="ctrl-pages"></div>
+
+    <!-- ── REPORT PAGE ── -->
+    <div class="page" id="page-report">
+      <div class="rpt-banner">
+        <div class="rpt-eye" id="rpt-eye">RAPPORT · CONFIDENTIEL</div>
+        <div class="rpt-h1" id="rpt-h1">Rapport d'Évaluation — Guide CIS PME</div>
+        <div class="rpt-meta" id="rpt-meta"></div>
+        <div class="rpt-pill" id="rpt-pill"></div>
+      </div>
+      <div class="rpt-grid" id="rpt-grid"></div>
+      <div class="findings-card">
+        <div class="fc-head" id="fc-head">Observations clés &amp; lacunes prioritaires</div>
+        <div id="fc-body"></div>
+      </div>
+      <div class="rpt-actions">
+        <button class="rpt-btn prim" onclick="togglePrintPanel()" id="rpt-print">🖨 Imprimer / PDF</button>
+        <button class="rpt-btn" onclick="doExportCSV()" id="rpt-csv">↓ Exporter CSV</button>
+        <button class="rpt-btn" onclick="doReset()" id="rpt-reset">↺ Recommencer</button>
+      </div>
+    </div>
+
+  </main>
+</div><!-- /layout -->
+</div><!-- /app -->
+
+<script>
+/* ═══════════════════════════════════
+   TRANSLATIONS
+═══════════════════════════════════ */
+const TR = {
+  fr:{
+    opts:["Inexistant — aucun contrôle en place","Partiel — informel ou incomplet","En développement — initié mais non systématique","Défini — documenté et appliqué","Optimisé — mesuré et continuellement amélioré"],
+    naOpt:"S/O — Non applicable",
+    notePh:"Notes, preuves observées, commentaires d'audit…",
+    progSfx:"% complété",
+    noteLabel:"Notes d'audit / preuves",
+    prevBtn:"← Précédent",
+    nextBtn:"Suivant →",
+    rptBtn:"Rapport final →",
+  },
+  en:{
+    opts:["Non-existent — no control in place","Partial — informal or incomplete","Developing — initiated but not systematic","Defined — documented and enforced","Optimized — measured and continuously improved"],
+    naOpt:"N/A — Not applicable",
+    notePh:"Notes, observed evidence, audit comments…",
+    progSfx:"% complete",
+    noteLabel:"Audit notes / evidence",
+    prevBtn:"← Previous",
+    nextBtn:"Next →",
+    rptBtn:"Final Report →",
+  }
+};
+
+/* ═══════════════════════════════════
+   DATA — 19 × 5 QUESTIONS
+═══════════════════════════════════ */
+const SECTIONS = [
+{id:"c01",num:"01",icon:"🗂",pillars:["protect"],
+ fr:{title:"Inventaire et contrôle des actifs matériels",sub:"CIS Control 1 — Équipements, cycle de vie, actifs non autorisés"},
+ en:{title:"Inventory & Control of Enterprise Assets",sub:"CIS Control 1 — Hardware, lifecycle, unauthorized assets"},
+ qs:[
+  {id:"01a",ref:"CIS 1.1",pillars:["protect"],fr:"L'organisation maintient-elle un inventaire formalisé et à jour de tous les équipements matériels (serveurs, postes, portables, appareils mobiles, équipements réseau, IoT, imprimantes)?",en:"Does the organization maintain a formalized, up-to-date inventory of all hardware assets (servers, workstations, laptops, mobile devices, network equipment, IoT, printers)?"},
+  {id:"01b",ref:"CIS 1.2",pillars:["protect"],fr:"Un processus permet-il de détecter et d'isoler les équipements non autorisés (shadow IT) connectés au réseau avant qu'ils ne causent un incident?",en:"Is there a process to detect and isolate unauthorized devices (shadow IT) on the network before they cause an incident?"},
+  {id:"01c",ref:"CIS 1.3",pillars:["protect"],fr:"Chaque actif matériel est-il associé à un propriétaire responsable, une classification (criticité) et un emplacement documentés?",en:"Is each hardware asset assigned to a responsible owner with documented classification (criticality) and location?"},
+  {id:"01d",ref:"CIS 1.4",pillars:["protect"],fr:"Le cycle de vie complet des actifs (acquisition, déploiement, décommissionnement, destruction sécurisée des données) est-il documenté et suivi?",en:"Is the full asset lifecycle (acquisition, deployment, decommissioning, secure data destruction) documented and tracked?"},
+  {id:"01e",ref:"CIS 1.5",pillars:["protect","culture"],fr:"L'inventaire des actifs est-il revu et mis à jour au minimum trimestriellement et lors de tout changement organisationnel ou d'infrastructure?",en:"Is the asset inventory reviewed and updated at minimum quarterly and upon any organizational or infrastructure change?"},
+]},
+{id:"c02",num:"02",icon:"💾",pillars:["protect"],
+ fr:{title:"Inventaire et contrôle des actifs logiciels",sub:"CIS Control 2 — Logiciels, licences, fin de vie"},
+ en:{title:"Inventory & Control of Software Assets",sub:"CIS Control 2 — Software, licenses, end-of-life"},
+ qs:[
+  {id:"02a",ref:"CIS 2.1",pillars:["protect"],fr:"Un inventaire de tous les logiciels autorisés (incluant version, éditeur, licence) est-il maintenu pour chaque poste de travail et serveur?",en:"Is an inventory of all authorized software (including version, vendor, license) maintained for each workstation and server?"},
+  {id:"02b",ref:"CIS 2.2",pillars:["protect"],fr:"Les logiciels non autorisés sont-ils détectés et supprimés via un mécanisme de contrôle applicatif ou de liste blanche approuvée?",en:"Is unauthorized software detected and removed via application control or an approved allowlist mechanism?"},
+  {id:"02c",ref:"CIS 2.3",pillars:["protect"],fr:"Les logiciels en fin de vie (p. ex. Windows 7, Server 2008, Office 2010) ont-ils été migrés ou font-ils l'objet de contrôles compensatoires documentés?",en:"Have end-of-life software versions (e.g. Windows 7, Server 2008, Office 2010) been migrated or are they subject to documented compensating controls?"},
+  {id:"02d",ref:"CIS 2.4",pillars:["protect"],fr:"Les licences logicielles sont-elles gérées afin d'éviter l'utilisation de logiciels piratés, non conformes ou dont les conditions d'utilisation sont expirées?",en:"Are software licenses managed to avoid the use of pirated, non-compliant or expired-terms software?"},
+  {id:"02e",ref:"CIS 2.5",pillars:["protect","culture"],fr:"Un processus d'approbation formel est-il requis avant l'installation de tout nouveau logiciel ou abonnement SaaS par un employé ou un prestataire?",en:"Is a formal approval process required before installing any new software or SaaS subscription by an employee or contractor?"},
+]},
+{id:"c03",num:"03",icon:"🔒",pillars:["protect"],
+ fr:{title:"Protection des données",sub:"CIS Control 3 — Classification, chiffrement, rétention, Loi 25"},
+ en:{title:"Data Protection",sub:"CIS Control 3 — Classification, encryption, retention, Law 25"},
+ qs:[
+  {id:"03a",ref:"CIS 3.1",pillars:["protect","culture"],fr:"Les données sont-elles classifiées selon leur sensibilité (publique, interne, confidentielle, données personnelles au sens de la Loi 25)?",en:"Is data classified by sensitivity level (public, internal, confidential, personal data under Law 25)?"},
+  {id:"03b",ref:"CIS 3.2",pillars:["protect"],fr:"Les données sensibles au repos (postes, serveurs, portables, clés USB) sont-elles chiffrées (BitLocker, FileVault, AES-256 ou équivalent)?",en:"Is sensitive data at rest (workstations, servers, laptops, USB drives) encrypted (BitLocker, FileVault, AES-256 or equivalent)?"},
+  {id:"03c",ref:"CIS 3.3",pillars:["protect"],fr:"Les transmissions de données sensibles utilisent-elles exclusivement des protocoles chiffrés (TLS 1.2+, SFTP, HTTPS)? Les protocoles non sécurisés (FTP, Telnet) sont-ils bloqués?",en:"Do sensitive data transmissions exclusively use encrypted protocols (TLS 1.2+, SFTP, HTTPS)? Are insecure protocols (FTP, Telnet) blocked?"},
+  {id:"03d",ref:"CIS 3.4 / Loi 25",pillars:["protect","culture"],fr:"Une politique de rétention et de suppression des données personnelles conforme à la Loi 25 est-elle documentée, appliquée et auditée périodiquement?",en:"Is a personal data retention and deletion policy compliant with Law 25 documented, enforced and periodically audited?"},
+  {id:"03e",ref:"CIS 3.5",pillars:["protect"],fr:"Les supports amovibles (clés USB, disques externes) sont-ils encadrés par une politique d'usage et les données sensibles sur ces supports sont-elles chiffrées ou interdites?",en:"Are removable media (USB drives, external disks) governed by a usage policy and is sensitive data on these media encrypted or prohibited?"},
+]},
+{id:"c04",num:"04",icon:"⚙️",pillars:["protect"],
+ fr:{title:"Configuration sécurisée des actifs",sub:"CIS Control 4 — Durcissement, baselines, cloud"},
+ en:{title:"Secure Configuration of Enterprise Assets",sub:"CIS Control 4 — Hardening, baselines, cloud"},
+ qs:[
+  {id:"04a",ref:"CIS 4.1",pillars:["protect"],fr:"Les configurations par défaut des systèmes (OS, équipements réseau, routeurs, NAS, imprimantes) sont-elles modifiées lors du déploiement (mots de passe changés, services inutiles désactivés)?",en:"Are default configurations on systems (OS, network devices, routers, NAS, printers) changed upon deployment (passwords changed, unnecessary services disabled)?"},
+  {id:"04b",ref:"CIS 4.2",pillars:["protect"],fr:"Des configurations de sécurité de référence (CIS Benchmarks, DISA STIGs ou équivalent) sont-elles définies et appliquées aux systèmes critiques?",en:"Are security baseline configurations (CIS Benchmarks, DISA STIGs or equivalent) defined and applied to critical systems?"},
+  {id:"04c",ref:"CIS 4.3",pillars:["protect"],fr:"Les environnements cloud (Microsoft 365, Google Workspace, AWS, Azure) sont-ils durcis selon les meilleures pratiques (Microsoft Secure Score, CIS Benchmarks cloud)?",en:"Are cloud environments (Microsoft 365, Google Workspace, AWS, Azure) hardened per best practices (Microsoft Secure Score, CIS Cloud Benchmarks)?"},
+  {id:"04d",ref:"CIS 4.4",pillars:["protect","detect"],fr:"Un processus de gestion des changements de configuration est-il en place pour détecter les dérives et modifications non autorisées des systèmes critiques?",en:"Is a configuration change management process in place to detect drift and unauthorized changes to critical systems?"},
+  {id:"04e",ref:"CIS 4.5",pillars:["protect"],fr:"Les équipements réseau (routeurs, commutateurs, firewalls) font-ils l'objet de mises à jour de firmware régulières et d'une revue périodique de leurs règles de sécurité?",en:"Do network devices (routers, switches, firewalls) receive regular firmware updates and periodic security rule reviews?"},
+]},
+{id:"c05",num:"05",icon:"👤",pillars:["protect"],
+ fr:{title:"Gestion des comptes",sub:"CIS Control 5 — Comptes, cycle de vie, onboarding/offboarding"},
+ en:{title:"Account Management",sub:"CIS Control 5 — Accounts, lifecycle, onboarding/offboarding"},
+ qs:[
+  {id:"05a",ref:"CIS 5.1",pillars:["protect"],fr:"Tous les comptes utilisateurs sont-ils documentés, liés à un individu identifiable et approuvés via un processus formel (aucun compte générique ou partagé)?",en:"Are all user accounts documented, tied to an identifiable individual and approved via a formal process (no generic or shared accounts)?"},
+  {id:"05b",ref:"CIS 5.2",pillars:["protect"],fr:"Les accès sont-ils révoqués dans les 24 heures suivant le départ ou un changement de rôle d'un employé ou d'un prestataire?",en:"Are accesses revoked within 24 hours of an employee or contractor departure or role change?"},
+  {id:"05c",ref:"CIS 5.3",pillars:["protect"],fr:"Une revue formelle des comptes et des droits d'accès est-elle conduite au minimum annuellement pour tous les utilisateurs?",en:"Is a formal account and access rights review conducted at minimum annually for all users?"},
+  {id:"05d",ref:"CIS 5.4",pillars:["protect"],fr:"Les comptes de service, applicatifs et d'administration sont-ils inventoriés séparément, documentés et soumis à des contrôles renforcés?",en:"Are service, application and administrative accounts inventoried separately, documented and subject to enhanced controls?"},
+  {id:"05e",ref:"CIS 5.5",pillars:["protect","culture"],fr:"Les accès des prestataires et fournisseurs externes sont-ils limités dans le temps, journalisés, approuvés et révoqués formellement en fin de mandat?",en:"Are external contractor and vendor accesses time-limited, logged, approved and formally revoked at the end of their engagement?"},
+]},
+{id:"c06",num:"06",icon:"🔑",pillars:["protect"],
+ fr:{title:"Gestion des contrôles d'accès",sub:"CIS Control 6 — Moindre privilège, MFA, PAM"},
+ en:{title:"Access Control Management",sub:"CIS Control 6 — Least privilege, MFA, PAM"},
+ qs:[
+  {id:"06a",ref:"CIS 6.1",pillars:["protect"],fr:"Le principe du moindre privilège est-il appliqué — chaque utilisateur n'a accès qu'aux systèmes et données strictement nécessaires à ses fonctions?",en:"Is the principle of least privilege enforced — each user has access only to systems and data strictly necessary for their role?"},
+  {id:"06b",ref:"CIS 6.2",pillars:["protect"],fr:"L'authentification multifacteur (MFA) est-elle activée pour tous les accès distants (VPN, RDP, courriel cloud, Microsoft 365, portails web)?",en:"Is multi-factor authentication (MFA) enabled for all remote access (VPN, RDP, cloud email, Microsoft 365, web portals)?"},
+  {id:"06c",ref:"CIS 6.3",pillars:["protect"],fr:"Les comptes administrateurs sont-ils distincts des comptes quotidiens, protégés par MFA matériel et utilisés uniquement pour les tâches d'administration?",en:"Are administrator accounts separate from daily accounts, protected by hardware MFA and used only for administrative tasks?"},
+  {id:"06d",ref:"CIS 6.4",pillars:["protect"],fr:"Une politique de mots de passe robuste (longueur ≥12 car., non-réutilisation) est-elle en vigueur et un gestionnaire de mots de passe certifié est-il déployé?",en:"Is a robust password policy (length ≥12 chars, non-reuse) enforced and a certified password manager deployed?"},
+  {id:"06e",ref:"CIS 6.5",pillars:["protect"],fr:"Un processus de gestion des accès privilégiés (PAM) est-il en place pour surveiller, journaliser et contrôler l'utilisation des comptes à hauts privilèges?",en:"Is a Privileged Access Management (PAM) process in place to monitor, log and control high-privilege account usage?"},
+]},
+{id:"c07",num:"07",icon:"🔍",pillars:["protect","detect"],
+ fr:{title:"Gestion continue des vulnérabilités",sub:"CIS Control 7 — Correctifs, scans, remédiation"},
+ en:{title:"Continuous Vulnerability Management",sub:"CIS Control 7 — Patches, scans, remediation"},
+ qs:[
+  {id:"07a",ref:"CIS 7.1",pillars:["protect"],fr:"Un processus formalisé de gestion des correctifs est-il en place? Les correctifs critiques (CVSS ≥ 7) sont-ils appliqués dans les 30 jours suivant leur publication?",en:"Is a formalized patch management process in place? Are critical patches (CVSS ≥ 7) applied within 30 days of release?"},
+  {id:"07b",ref:"CIS 7.2",pillars:["detect"],fr:"Des analyses de vulnérabilités automatisées sont-elles effectuées mensuellement en interne et trimestriellement sur les systèmes exposés à Internet?",en:"Are automated vulnerability scans performed monthly internally and quarterly on internet-exposed systems?"},
+  {id:"07c",ref:"CIS 7.3",pillars:["protect"],fr:"Les vulnérabilités identifiées sont-elles priorisées par criticité, assignées à un responsable et suivies jusqu'à remédiation dans un registre formel?",en:"Are identified vulnerabilities prioritized by criticality, assigned to an owner and tracked to remediation in a formal register?"},
+  {id:"07d",ref:"CIS 7.4",pillars:["protect","detect"],fr:"La surface d'attaque externe est-elle connue et documentée? Des tests de pénétration ou un processus de gestion de la surface d'attaque (EASM) sont-ils conduits périodiquement?",en:"Is the external attack surface known and documented? Are penetration tests or an External Attack Surface Management (EASM) process conducted periodically?"},
+  {id:"07e",ref:"CIS 7.5",pillars:["protect"],fr:"Une veille sur les avis de sécurité des éditeurs (CVE, bulletins CERT, CISA KEV) est-elle en place pour les logiciels et équipements utilisés?",en:"Is threat intelligence watchlisting in place for vendor security advisories (CVE, CERT bulletins, CISA KEV) for software and equipment used?"},
+]},
+{id:"c08",num:"08",icon:"📋",pillars:["detect"],
+ fr:{title:"Gestion des journaux d'audit",sub:"CIS Control 8 — Journalisation, SIEM, conservation"},
+ en:{title:"Audit Log Management",sub:"CIS Control 8 — Logging, SIEM, retention"},
+ qs:[
+  {id:"08a",ref:"CIS 8.1",pillars:["detect"],fr:"La journalisation est-elle activée sur tous les systèmes critiques: contrôleurs de domaine, serveurs de fichiers, firewalls, postes administrateurs, systèmes cloud?",en:"Is logging enabled on all critical systems: domain controllers, file servers, firewalls, admin workstations, cloud systems?"},
+  {id:"08b",ref:"CIS 8.2",pillars:["detect"],fr:"Les journaux sont-ils centralisés dans un outil de gestion (SIEM, Microsoft Sentinel, Graylog, Splunk) et conservés pendant au minimum 90 jours (12 mois recommandés)?",en:"Are logs centralized in a management tool (SIEM, Microsoft Sentinel, Graylog, Splunk) and retained for at minimum 90 days (12 months recommended)?"},
+  {id:"08c",ref:"CIS 8.3",pillars:["detect"],fr:"Des alertes automatiques sont-elles configurées pour les événements anormaux: connexions hors heures, tentatives échouées répétées, modifications de privilèges, création de comptes?",en:"Are automated alerts configured for abnormal events: after-hours logins, repeated failed attempts, privilege changes, account creation?"},
+  {id:"08d",ref:"CIS 8.4",pillars:["detect"],fr:"Les horloges de tous les systèmes sont-elles synchronisées (NTP) pour permettre la corrélation chronologique des événements lors d'une investigation?",en:"Are all system clocks synchronized (NTP) to enable chronological event correlation during investigations?"},
+  {id:"08e",ref:"CIS 8.5",pillars:["detect","respond"],fr:"Les alertes de sécurité sont-elles examinées par une personne qualifiée ou un MSSP dans un délai défini et documenté? Les faux positifs sont-ils gérés?",en:"Are security alerts reviewed by a qualified person or MSSP within a defined and documented timeframe (SLA)? Are false positives managed?"},
+]},
+{id:"c09",num:"09",icon:"📧",pillars:["protect","detect"],
+ fr:{title:"Protection des courriels et navigateurs",sub:"CIS Control 9 — SPF/DKIM/DMARC, hameçonnage, filtrage web"},
+ en:{title:"Email & Web Browser Protections",sub:"CIS Control 9 — SPF/DKIM/DMARC, phishing, web filtering"},
+ qs:[
+  {id:"09a",ref:"CIS 9.1",pillars:["protect"],fr:"Les protocoles d'authentification SPF, DKIM et DMARC sont-ils configurés et en mode rejet (p=reject) pour tous les domaines courriel de l'organisation?",en:"Are SPF, DKIM and DMARC authentication protocols configured and in reject mode (p=reject) for all organizational email domains?"},
+  {id:"09b",ref:"CIS 9.2",pillars:["protect"],fr:"Un filtrage anti-spam, anti-hameçonnage et analyse des pièces jointes est-il activé (ex. Microsoft Defender for O365, Proofpoint, Mimecast)?",en:"Is anti-spam, anti-phishing and attachment analysis filtering enabled (e.g. Microsoft Defender for O365, Proofpoint, Mimecast)?"},
+  {id:"09c",ref:"CIS 9.3",pillars:["protect"],fr:"La navigation web est-elle filtrée par un proxy, un DNS sécurisé (Cisco Umbrella, NextDNS) ou un système de filtrage de contenu bloquant les catégories malveillantes?",en:"Is web browsing filtered by a proxy, secure DNS (Cisco Umbrella, NextDNS) or content filtering system blocking malicious categories?"},
+  {id:"09d",ref:"CIS 9.4",pillars:["culture","detect"],fr:"Des simulations de hameçonnage sont-elles conduites régulièrement (≥ 2×/an) pour mesurer et améliorer la vigilance des employés, avec suivi des résultats?",en:"Are phishing simulations regularly conducted (≥ 2×/year) to measure and improve employee vigilance, with tracked results?"},
+  {id:"09e",ref:"CIS 9.5",pillars:["protect"],fr:"Les extensions et plugins de navigateur sont-ils contrôlés et restreints aux applications approuvées? Les mises à jour automatiques des navigateurs sont-elles activées?",en:"Are browser extensions and plugins controlled and restricted to approved applications? Are automatic browser updates enabled?"},
+]},
+{id:"c10",num:"10",icon:"🦠",pillars:["protect","detect"],
+ fr:{title:"Défenses contre les logiciels malveillants",sub:"CIS Control 10 — EDR/XDR, sauvegardes, macros"},
+ en:{title:"Malware Defenses",sub:"CIS Control 10 — EDR/XDR, backups, macros"},
+ qs:[
+  {id:"10a",ref:"CIS 10.1",pillars:["protect"],fr:"Un logiciel antimaliciel de niveau entreprise (EDR/XDR ou antivirus managé) est-il installé, actif et mis à jour sur tous les postes, portables et serveurs?",en:"Is enterprise-grade antimalware (EDR/XDR or managed antivirus) installed, active and updated on all workstations, laptops and servers?"},
+  {id:"10b",ref:"CIS 10.2",pillars:["protect","detect"],fr:"La protection en temps réel est-elle activée, les analyses planifiées configurées et les alertes de détection revues dans des délais définis?",en:"Is real-time protection enabled, scheduled scans configured and detection alerts reviewed within defined timeframes?"},
+  {id:"10c",ref:"CIS 10.3",pillars:["protect"],fr:"Des sauvegardes automatisées régulières (quotidiennes ou hebdomadaires) de toutes les données critiques sont-elles effectuées et leur restauration testée périodiquement?",en:"Are automated regular (daily or weekly) backups of all critical data performed and their restoration periodically tested?"},
+  {id:"10d",ref:"CIS 10.4",pillars:["protect","respond"],fr:"Les sauvegardes sont-elles stockées hors ligne ou dans un environnement cloud isolé du réseau principal (règle 3-2-1)? La restauration est-elle testée au moins annuellement?",en:"Are backups stored offline or in a cloud environment isolated from the main network (3-2-1 rule)? Is restoration tested at least annually?"},
+  {id:"10e",ref:"CIS 10.5",pillars:["protect"],fr:"Les macros Office et les scripts PowerShell sont-ils désactivés ou restreints aux utilisateurs ayant un besoin légitime documenté et approuvé?",en:"Are Office macros and PowerShell scripts disabled or restricted to users with a documented, approved legitimate need?"},
+]},
+{id:"c11",num:"11",icon:"♻️",pillars:["respond"],
+ fr:{title:"Récupération des données et continuité",sub:"CIS Control 11 — PCA, PRA/DRP, RTO/RPO, tests"},
+ en:{title:"Data Recovery & Business Continuity",sub:"CIS Control 11 — BCP, DRP, RTO/RPO, testing"},
+ qs:[
+  {id:"11a",ref:"CIS 11.1",pillars:["respond"],fr:"Un plan de continuité des affaires (PCA) et un plan de reprise après sinistre (PRA/DRP) sont-ils documentés, approuvés et incluent-ils des objectifs RTO et RPO définis?",en:"Are a Business Continuity Plan (BCP) and Disaster Recovery Plan (DRP) documented, approved and include defined RTO and RPO objectives?"},
+  {id:"11b",ref:"CIS 11.2",pillars:["respond"],fr:"Le PCA/PRA est-il testé au minimum une fois par an via un exercice (tabletop, simulation de reprise)? Les résultats et les écarts sont-ils documentés et corrigés?",en:"Is the BCP/DRP tested at minimum once per year via an exercise (tabletop, recovery simulation)? Are results and gaps documented and corrected?"},
+  {id:"11c",ref:"CIS 11.3",pillars:["respond"],fr:"Les processus métier critiques sont-ils identifiés et priorisés via une analyse d'impact (BIA) pour orienter les efforts de reprise et les investissements en résilience?",en:"Are critical business processes identified and prioritized via a Business Impact Analysis (BIA) to guide recovery efforts and resilience investments?"},
+  {id:"11d",ref:"CIS 11.4",pillars:["respond","culture"],fr:"Une liste de contacts d'urgence (équipe TI, MSSP, assureur cyber, conseiller juridique, direction) est-elle disponible hors ligne, à jour et connue des parties prenantes?",en:"Is an emergency contact list (IT team, MSSP, cyber insurer, legal counsel, management) available offline, up to date and known to stakeholders?"},
+  {id:"11e",ref:"CIS 11.5",pillars:["respond"],fr:"Des procédures de reprise documentées couvrent-elles les scénarios de sinistre les plus probables: ransomware, panne matérielle, sinistre physique et défaillance d'un fournisseur clé?",en:"Do documented recovery procedures cover the most likely disaster scenarios: ransomware, hardware failure, physical disaster and key vendor failure?"},
+]},
+{id:"c12",num:"12",icon:"🌐",pillars:["protect","detect"],
+ fr:{title:"Gestion de l'infrastructure réseau",sub:"CIS Control 12 — Firewall, segmentation, VPN, Wi-Fi"},
+ en:{title:"Network Infrastructure Management",sub:"CIS Control 12 — Firewall, segmentation, VPN, Wi-Fi"},
+ qs:[
+  {id:"12a",ref:"CIS 12.1",pillars:["protect"],fr:"Un pare-feu d'entreprise est-il en place entre Internet et le réseau interne? Les règles sont-elles documentées, minimales (moindre privilège) et révisées périodiquement?",en:"Is an enterprise firewall in place between the internet and the internal network? Are rules documented, minimal (least privilege) and periodically reviewed?"},
+  {id:"12b",ref:"CIS 12.2",pillars:["protect"],fr:"Une segmentation réseau (VLANs, DMZ) isole-t-elle les systèmes critiques, serveurs, systèmes de point de vente, appareils IoT et utilisateurs invités?",en:"Does network segmentation (VLANs, DMZ) isolate critical systems, servers, point-of-sale systems, IoT devices and guest users?"},
+  {id:"12c",ref:"CIS 12.3",pillars:["protect"],fr:"L'accès distant se fait-il exclusivement via un VPN sécurisé avec MFA? Les accès directs RDP, VNC ou SSH vers Internet sont-ils interdits ou protégés par un bastion?",en:"Is remote access exclusively through a secure VPN with MFA? Are direct RDP, VNC or SSH connections to the internet prohibited or protected by a bastion host?"},
+  {id:"12d",ref:"CIS 12.4",pillars:["protect"],fr:"Le réseau Wi-Fi d'entreprise utilise-t-il WPA3 ou WPA2-Enterprise avec RADIUS? Le réseau invité est-il isolé du réseau d'entreprise avec une bande passante limitée?",en:"Does corporate Wi-Fi use WPA3 or WPA2-Enterprise with RADIUS? Is the guest network isolated from the corporate network with limited bandwidth?"},
+  {id:"12e",ref:"CIS 12.5",pillars:["detect"],fr:"Les flux réseau (netflow, journaux firewall, requêtes DNS) sont-ils analysés pour détecter des comportements anormaux: communications sortantes inhabituelles, scans internes?",en:"Are network flows (netflow, firewall logs, DNS queries) analyzed to detect abnormal behavior: unusual outbound communications, internal scanning?"},
+]},
+{id:"c13",num:"13",icon:"👁",pillars:["detect"],
+ fr:{title:"Surveillance et défense du réseau",sub:"CIS Control 13 — NDR, IDS/IPS, threat intel, dark web"},
+ en:{title:"Network Monitoring & Defense",sub:"CIS Control 13 — NDR, IDS/IPS, threat intel, dark web"},
+ qs:[
+  {id:"13a",ref:"CIS 13.1",pillars:["detect"],fr:"Un système de détection ou de prévention des intrusions (IDS/IPS) ou une solution de détection réseau (NDR) est-il en place en périphérie et en interne?",en:"Is an intrusion detection/prevention (IDS/IPS) or network detection and response (NDR) solution deployed at the perimeter and internally?"},
+  {id:"13b",ref:"CIS 13.2",pillars:["detect"],fr:"Les journaux réseau (firewall, proxy, DNS, VPN) sont-ils collectés et corrélés dans un SIEM ou outil équivalent pour détecter les menaces et soutenir les investigations?",en:"Are network logs (firewall, proxy, DNS, VPN) collected and correlated in a SIEM or equivalent tool for threat detection and investigations?"},
+  {id:"13c",ref:"CIS 13.3",pillars:["detect"],fr:"Une surveillance du dark web ou des alertes de fuite de données (leak monitoring) est-elle en place pour détecter l'exposition d'identifiants ou de données de l'organisation?",en:"Is dark web monitoring or data leak alerting in place to detect exposure of organizational credentials or data?"},
+  {id:"13d",ref:"CIS 13.4",pillars:["detect","protect"],fr:"Le trafic SSL/TLS sortant est-il inspecté (SSL inspection) pour détecter les communications malveillantes dissimulées dans des tunnels chiffrés?",en:"Is outbound SSL/TLS traffic inspected (SSL inspection) to detect malicious communications hidden within encrypted tunnels?"},
+  {id:"13e",ref:"CIS 13.5",pillars:["detect","respond"],fr:"Des indicateurs de compromission (IoC) issus de flux de renseignements sur les menaces (MISP, CISA, ANSSI, MS-ISAC) sont-ils intégrés dans les outils de détection?",en:"Are indicators of compromise (IoC) from threat intelligence feeds (MISP, CISA, ANSSI, MS-ISAC) integrated into detection tools?"},
+]},
+{id:"c14",num:"14",icon:"🧠",pillars:["culture"],
+ fr:{title:"Sensibilisation et formation en cybersécurité",sub:"CIS Control 14 — Programme, formation obligatoire, hameçonnage"},
+ en:{title:"Security Awareness & Skills Training",sub:"CIS Control 14 — Program, mandatory training, phishing"},
+ qs:[
+  {id:"14a",ref:"CIS 14.1",pillars:["culture"],fr:"Un programme formel de sensibilisation à la cybersécurité est-il en place pour tous les employés, incluant les nouveaux arrivants, les temporaires et les sous-traitants?",en:"Is a formal cybersecurity awareness program in place for all employees, including new hires, temporary workers and contractors?"},
+  {id:"14b",ref:"CIS 14.2",pillars:["culture"],fr:"La formation en cybersécurité est-elle obligatoire, documentée et réalisée au minimum une fois par an? Les taux de complétion sont-ils suivis et rapportés à la direction?",en:"Is cybersecurity training mandatory, documented and completed at minimum once per year? Are completion rates tracked and reported to management?"},
+  {id:"14c",ref:"CIS 14.3",pillars:["culture"],fr:"Les employés sont-ils formés sur les risques spécifiques aux PME québécoises: hameçonnage en français, fraude au président (BEC), faux fournisseurs, arnaques par virement bancaire?",en:"Are employees trained on risks specific to Québec SMBs: French-language phishing, CEO fraud (BEC), fake vendor scams, wire transfer fraud?"},
+  {id:"14d",ref:"CIS 14.4",pillars:["culture","respond"],fr:"Un mécanisme simple et connu de signalement des incidents suspects (bouton de courriel, adresse dédiée, extension Outlook) est-il utilisé et suivi de retours d'information?",en:"Is a simple, well-known incident reporting mechanism (email button, dedicated address, Outlook add-in) used and followed up with feedback?"},
+  {id:"14e",ref:"CIS 14.5",pillars:["culture"],fr:"La direction (PDG, propriétaire, conseil d'administration) est-elle activement impliquée dans les discussions cybersécurité et formée sur son rôle de gouvernance et sa responsabilité légale?",en:"Is management (CEO, owner, board) actively involved in cybersecurity discussions and trained on their governance role and legal responsibilities?"},
+]},
+{id:"c15",num:"15",icon:"🔗",pillars:["protect","culture"],
+ fr:{title:"Gestion des fournisseurs de services",sub:"CIS Control 15 — Tiers, SaaS, Loi 25, contrats, déoffboarding"},
+ en:{title:"Service Provider Management",sub:"CIS Control 15 — Third parties, SaaS, Law 25, contracts, off-boarding"},
+ qs:[
+  {id:"15a",ref:"CIS 15.1",pillars:["culture","protect"],fr:"Un inventaire des fournisseurs et sous-traitants ayant accès aux données ou systèmes de l'organisation est-il maintenu avec leur niveau de criticité et le type de données accessibles?",en:"Is an inventory of vendors and subcontractors with access to organizational data or systems maintained, including criticality level and data types accessed?"},
+  {id:"15b",ref:"CIS 15.2",pillars:["culture"],fr:"Les contrats avec les fournisseurs critiques incluent-ils des clauses de sécurité, de protection des données personnelles (Loi 25), de notification en cas d'incident et de droit d'audit?",en:"Do contracts with critical vendors include security, personal data protection (Law 25), incident notification and right-to-audit clauses?"},
+  {id:"15c",ref:"CIS 15.3",pillars:["protect"],fr:"Le niveau de sécurité des fournisseurs critiques est-il évalué avant sélection et réévalué périodiquement (questionnaire sécurité, ISO 27001, SOC 2, rapport de test de pénétration)?",en:"Are critical vendors' security levels assessed before selection and periodically re-evaluated (security questionnaire, ISO 27001, SOC 2, pentest report)?"},
+  {id:"15d",ref:"CIS 15.4 / Loi 25",pillars:["protect","culture"],fr:"L'organisation connaît-elle le pays d'hébergement des données de ses solutions SaaS et s'assure-t-elle de la conformité Loi 25 (consentement, localisation, sous-traitance documentée)?",en:"Does the organization know the data hosting country for its SaaS solutions and ensure Law 25 compliance (consent, data location, documented sub-processing)?"},
+  {id:"15e",ref:"CIS 15.5",pillars:["protect"],fr:"Un processus de déoffboarding des fournisseurs est-il formalisé (révocation des accès, retour ou destruction certifiée des données, clôture des comptes et licences)?",en:"Is a vendor off-boarding process formalized (access revocation, certified data return or destruction, account and license closure)?"},
+]},
+{id:"c16",num:"16",icon:"🏢",pillars:["protect","culture"],
+ fr:{title:"Sécurité applicative, physique et télétravail",sub:"CIS Control 16 — Dev sécurisé, BYOD, physique, fin de vie"},
+ en:{title:"Application Security, Physical & Remote Work",sub:"CIS Control 16 — Secure dev, BYOD, physical, end-of-life"},
+ qs:[
+  {id:"16a",ref:"CIS 16.1",pillars:["protect"],fr:"Si l'organisation développe des logiciels, des pratiques de développement sécurisé (OWASP Top 10, SAST, DAST, revue de code) sont-elles intégrées dans le cycle de développement?",en:"If the organization develops software, are secure development practices (OWASP Top 10, SAST, DAST, code review) integrated into the development lifecycle?"},
+  {id:"16b",ref:"CIS 16.2",pillars:["protect","culture"],fr:"Une politique de télétravail sécurisé est-elle documentée (VPN obligatoire, interdiction des réseaux publics non sécurisés, verrouillage d'écran, chiffrement du disque)?",en:"Is a secure remote work policy documented (mandatory VPN, prohibition of unsecured public networks, screen lock, full disk encryption)?"},
+  {id:"16c",ref:"CIS 16.3",pillars:["protect"],fr:"L'accès physique aux locaux techniques (salle serveur, armoires réseau) est-il contrôlé, journalisé et strictement limité aux personnes autorisées?",en:"Is physical access to technical areas (server room, network cabinets) controlled, logged and strictly limited to authorized personnel?"},
+  {id:"16d",ref:"CIS 16.4",pillars:["protect"],fr:"Les politiques BYOD sont-elles définies? Les appareils personnels accédant aux ressources de l'organisation sont-ils inscrits dans un MDM et soumis aux mêmes politiques de sécurité?",en:"Are BYOD policies defined? Are personal devices accessing organizational resources enrolled in MDM and subject to the same security policies?"},
+  {id:"16e",ref:"CIS 16.5",pillars:["protect"],fr:"Les équipements en fin de vie (postes, disques, imprimantes) font-ils l'objet d'une destruction certifiée des données (NIST 800-88, Blancco ou équivalent) avant mise au rebut?",en:"Are end-of-life assets (workstations, drives, printers) subject to certified data destruction (NIST 800-88, Blancco or equivalent) before disposal?"},
+]},
+{id:"c17",num:"17",icon:"🚨",pillars:["respond"],
+ fr:{title:"Gestion de la réponse aux incidents",sub:"CIS Control 17 — Plan RI, rôles, exercices, Loi 25 / CAI"},
+ en:{title:"Incident Response Management",sub:"CIS Control 17 — IR plan, roles, exercises, Law 25 / CAI"},
+ qs:[
+  {id:"17a",ref:"CIS 17.1",pillars:["respond"],fr:"Un plan de réponse aux incidents (PRI) formalisé et approuvé par la direction existe-t-il, couvrant les phases: préparation, détection, confinement, éradication, reprise et leçons apprises?",en:"Does a formalized, management-approved Incident Response Plan (IRP) exist, covering phases: preparation, detection, containment, eradication, recovery and lessons learned?"},
+  {id:"17b",ref:"CIS 17.2",pillars:["respond","culture"],fr:"Les rôles et responsabilités lors d'un incident (décideur, communicant, technicien, juridique, RH) sont-ils clairement définis, documentés et compris de toutes les parties prenantes?",en:"Are incident response roles (decision-maker, communicator, technician, legal, HR) clearly defined, documented and understood by all stakeholders?"},
+  {id:"17c",ref:"CIS 17.3",pillars:["respond"],fr:"Le plan de réponse aux incidents est-il testé via un exercice sur table ou une simulation au minimum une fois par an? Les résultats sont-ils documentés et les écarts corrigés?",en:"Is the incident response plan tested via a tabletop exercise or simulation at minimum once per year? Are results documented and gaps corrected?"},
+  {id:"17d",ref:"CIS 17.4 / Loi 25",pillars:["respond","culture"],fr:"Les obligations légales de notification en cas d'incident sont-elles connues et intégrées au PRI? (Loi 25: CAI et personnes affectées dans les 72h; BSIF si financier; RAMQ si santé)",en:"Are legal notification obligations integrated into the IRP? (Law 25: CAI and affected individuals within 72h; OSFI if financial; RAMQ if health sector)"},
+  {id:"17e",ref:"CIS 17.5",pillars:["respond","culture"],fr:"Des leçons apprises (post-mortem) sont-elles documentées après chaque incident ou exercice afin d'améliorer continuellement le plan de réponse et les contrôles en place?",en:"Are post-incident lessons learned documented after each incident or exercise to continuously improve the response plan and controls?"},
+]},
+{id:"c18",num:"18",icon:"🧪",pillars:["protect","culture"],
+ fr:{title:"Tests de pénétration et exercices offensifs",sub:"CIS Control 18 — Pentest, red team, audits tiers, roadmap"},
+ en:{title:"Penetration Testing",sub:"CIS Control 18 — Pentest, red team, third-party audits, roadmap"},
+ qs:[
+  {id:"18a",ref:"CIS 18.1",pillars:["protect"],fr:"Des tests de pénétration externes sont-ils réalisés par un tiers qualifié (CEH, OSCP, CREST) au minimum tous les deux ans ou après un changement majeur d'infrastructure?",en:"Are external penetration tests conducted by a qualified third party (CEH, OSCP, CREST) at minimum every two years or after a major infrastructure change?"},
+  {id:"18b",ref:"CIS 18.2",pillars:["protect"],fr:"Les résultats des tests de pénétration font-ils l'objet d'un plan de remédiation priorisé, suivi et vérifié? Les vulnérabilités critiques sont-elles traitées dans les 30 jours?",en:"Are penetration test results subject to a prioritized, tracked and verified remediation plan? Are critical vulnerabilities addressed within 30 days?"},
+  {id:"18c",ref:"CIS 18.3",pillars:["protect","detect"],fr:"Des exercices de simulation d'attaque (red team, purple team, test d'ingénierie sociale) sont-ils conduits pour tester l'efficacité réelle des contrôles de détection et de réponse?",en:"Are attack simulation exercises (red team, purple team, social engineering testing) conducted to test the real-world effectiveness of detection and response controls?"},
+  {id:"18d",ref:"CIS 18.4",pillars:["culture"],fr:"Les résultats des audits et tests de sécurité sont-ils présentés à la direction et intégrés dans la feuille de route cybersécurité (roadmap) de l'organisation?",en:"Are security audit and test results presented to management and integrated into the organization's cybersecurity roadmap?"},
+  {id:"18e",ref:"CIS 18.5",pillars:["protect","culture"],fr:"Un budget de cybersécurité dédié est-il alloué annuellement (outils, formation, audits, assurance, conseil) et la direction est-elle impliquée dans son approbation?",en:"Is a dedicated cybersecurity budget allocated annually (tools, training, audits, insurance, consulting) with management involvement in its approval?"},
+]},
+{id:"c19",num:"19",icon:"🤖",pillars:["protect","detect","culture"],
+ fr:{title:"Sécurité de l'intelligence artificielle",sub:"Extension CIS v8.1 — Gouvernance IA, risques, Loi 25"},
+ en:{title:"Artificial Intelligence Security",sub:"CIS v8.1 Extension — AI governance, risks, Law 25"},
+ qs:[
+  {id:"19a",ref:"CIS IA-1",pillars:["culture"],fr:"L'organisation dispose-t-elle d'une politique d'utilisation acceptable de l'IA (outils autorisés, données pouvant être partagées, cas d'usage interdits) communiquée et signée?",en:"Does the organization have an acceptable AI use policy (authorized tools, shareable data, prohibited use cases) communicated and signed off?"},
+  {id:"19b",ref:"CIS IA-2",pillars:["protect","culture"],fr:"Les risques de saisie de données confidentielles ou personnelles dans des outils IA publics (ChatGPT, Copilot public) sont-ils encadrés par des contrôles techniques ou des politiques documentées?",en:"Are risks of entering confidential or personal data into public AI tools (ChatGPT, public Copilot) controlled by technical controls or documented policies?"},
+  {id:"19c",ref:"CIS IA-3",pillars:["protect","detect"],fr:"Si l'organisation déploie ou utilise des modèles IA, les vecteurs d'attaque spécifiques (injection de prompts, empoisonnement de données, vol de modèle) sont-ils inclus dans l'analyse de risque?",en:"If the organization deploys or uses AI models, are specific attack vectors (prompt injection, data poisoning, model theft) included in the risk analysis?"},
+  {id:"19d",ref:"CIS IA-4",pillars:["detect","protect"],fr:"Des contrôles techniques sont-ils en place pour détecter et bloquer les tentatives d'abus des systèmes IA (injection de prompts, exfiltration de données, contournement des filtres)?",en:"Are technical controls in place to detect and block AI system abuse attempts (prompt injection, data exfiltration, filter bypassing)?"},
+  {id:"19e",ref:"CIS IA-5 / Loi 25",pillars:["culture","protect"],fr:"L'utilisation de l'IA est-elle incluse dans les processus de gestion des risques, de conformité (Loi 25, Loi 64) et de gouvernance, avec documentation des systèmes décisionnels automatisés?",en:"Is AI use included in risk management, compliance (Law 25, Bill 64) and governance processes, with documentation of automated decision-making systems?"},
+]},
+];
+
+/* ═══════════════════════════════════
+   STATE
+═══════════════════════════════════ */
+let lang = 'fr';
+let answers = {};
+let insStatus = '';
+let emergContacts = [];
+let printOpts = { all:false, notes:true, scale:true };
+
+/* ═══════════════════════════════════
+   LOADING
+═══════════════════════════════════ */
+const LM = {
+  fr:["Chargement des contrôles CIS v8.1…","Initialisation des 19 domaines…","Préparation du cadre PDRP…","Intégration Loi 25 et IA…","Configuration des piliers de maturité…","Validation du questionnaire…","Prêt."],
+  en:["Loading CIS Controls v8.1…","Initializing 19 domains…","Preparing PDRP framework…","Integrating Law 25 and AI…","Configuring maturity pillars…","Validating assessment guide…","Ready."]
+};
+
+function runLoader(){
+  const msgs = LM[lang], bar=document.getElementById('ld-bar'), msg=document.getElementById('ld-msg'), btn=document.getElementById('ld-enter');
+  let i=0;
+  const iv = setInterval(()=>{
+    if(i<msgs.length){ msg.textContent=msgs[i]; bar.style.width=(((i+1)/msgs.length)*100)+'%'; i++; }
+    else { clearInterval(iv); setTimeout(()=>{ btn.classList.add('show'); },300); }
+  },380);
+}
+
+function enterApp(){
+  document.getElementById('loading').classList.add('out');
+  const app=document.getElementById('app');
+  app.classList.add('show');
+  document.getElementById('f-date').valueAsDate=new Date();
+  buildSidebar();
+  buildCtrlPages();
+  buildEmergContacts();
+  updateProgress();
+}
+
+/* ═══════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════ */
+function buildSidebar(){
+  const root=document.getElementById('sb-controls');
+  root.innerHTML='';
+  SECTIONS.forEach(sec=>{
+    const t=lang==='fr'?sec.fr:sec.en;
+    const div=document.createElement('div');
+    div.className='sb-item';
+    div.id='sb-'+sec.id;
+    div.onclick=()=>goPage('ctrl-'+sec.id);
+    div.innerHTML=`
+      <span class="sb-num">${sec.num}</span>
+      <span class="sb-icon">${sec.icon}</span>
+      <div class="sb-info">
+        <div class="sb-name">${t.title}</div>
+        <div class="sb-sub">${t.sub.split('—')[0].trim()}</div>
+      </div>
+      <div class="sb-check" id="sbck-${sec.id}"></div>`;
+    root.appendChild(div);
+  });
+}
+
+function updateSidebarChecks(){
+  SECTIONS.forEach(sec=>{
+    const ans=sec.qs.filter(q=>answers[q.id]?.score!==undefined).length;
+    const ck=document.getElementById('sbck-'+sec.id);
+    if(!ck) return;
+    ck.className='sb-check'+(ans===sec.qs.length?' done':ans>0?' partial':'');
+  });
+}
+
+/* ═══════════════════════════════════
+   CONTROL PAGES
+═══════════════════════════════════ */
+function buildCtrlPages(){
+  const root=document.getElementById('ctrl-pages');
+  root.innerHTML='';
+  SECTIONS.forEach((sec,si)=>{
+    const pg=document.createElement('div');
+    pg.className='page';
+    pg.id='page-ctrl-'+sec.id;
+    root.appendChild(pg);
+    renderCtrlPage(sec, si, pg);
+  });
+}
+
+function renderCtrlPage(sec, si, pg){
+  const t=lang==='fr'?sec.fr:sec.en;
+  const pillsHtml=sec.pillars.map(p=>`<span class="cp cp-${p[0]}">${pillarLabel(p)}</span>`).join('');
+  const iconBg=pillarCol(sec.pillars[0]);
+  const answered=sec.qs.filter(q=>answers[q.id]?.score!==undefined).length;
+  const pips=sec.qs.map((_,i)=>{
+    const a=answers[sec.qs[i].id];
+    const cls=a?.score!==undefined?'done':'';
+    return `<div class="cp-pip ${cls}"></div>`;
+  }).join('');
+
+  const prevId=si>0?SECTIONS[si-1].id:null;
+  const nextId=si<SECTIONS.length-1?SECTIONS[si+1].id:null;
+  const prevBtn=prevId?`<button class="ctrl-nav-btn" onclick="goPage('ctrl-${prevId}')">${TR[lang].prevBtn}</button>`:'<div></div>';
+  const nextBtn=nextId
+    ?`<button class="ctrl-nav-btn primary" onclick="goPage('ctrl-${nextId}')">${TR[lang].nextBtn}</button>`
+    :`<button class="ctrl-nav-btn primary" onclick="goPage('report')">${TR[lang].rptBtn}</button>`;
+
+  pg.innerHTML=`
+    <div class="ctrl-header">
+      <div class="ctrl-icon-wrap" style="background:${iconBg}14;color:${iconBg}">${sec.icon}</div>
+      <div class="ctrl-meta">
+        <div class="ctrl-eyebrow">CIS Control ${sec.num} · ${lang==='fr'?'Question':'Question'} ${answered}/${sec.qs.length}</div>
+        <div class="ctrl-title">${t.title}</div>
+        <div class="ctrl-sub">${t.sub}</div>
+        <div class="ctrl-pills">${pillsHtml}</div>
+      </div>
+    </div>
+    <div class="ctrl-progress">
+      <span class="cp-label" id="cplbl-${sec.id}">${answered}/${sec.qs.length} ${lang==='fr'?'questions complétées':'questions completed'}</span>
+      <div class="cp-pips" id="cppips-${sec.id}">${pips}</div>
+    </div>
+    <div id="qs-${sec.id}">${sec.qs.map((q,qi)=>renderQuestion(q,sec.num,qi)).join('')}</div>
+    <div class="ctrl-nav">${prevBtn}${nextBtn}</div>`;
+}
+
+function renderQuestion(q, secNum, qi){
+  const opts=TR[lang].opts;
+  const naOpt=TR[lang].naOpt;
+  const notePh=TR[lang].notePh;
+  const noteLabel=TR[lang].noteLabel;
+  const qText=lang==='fr'?q.fr:q.en;
+  const cur=answers[q.id];
+  const curScore=cur?.score;
+  const curNote=cur?.note||'';
+  const hasAns=curScore!==undefined;
+
+  const dotHtml=q.pillars.map(p=>`<div class="q-pdot" style="background:${pillarCol(p)}"></div>`).join('');
+  const scoreInfo=hasAns&&curScore!=='na'?scoreTag(curScore):{label:'',bg:'',color:''};
+
+  const optsHtml=opts.map((txt,i)=>{
+    const sel=curScore===i?'sel':'';
+    return `<div class="s-opt s${i} ${sel}" id="so-${q.id}-${i}" onclick="selAns('${q.id}',${i})">
+      <div class="s-bullet"><div class="s-inner"></div></div>
+      <span class="s-badge">${i}</span>
+      <span class="s-label">${txt}</span>
+    </div>`;
+  }).join('');
+  const naSel=curScore==='na'?'sel':'';
+  const naHtml=`<div class="s-opt sna ${naSel}" id="so-${q.id}-na" onclick="selAns('${q.id}','na')">
+    <div class="s-bullet"><div class="s-inner"></div></div>
+    <span class="s-badge" style="font-size:8px">S/O</span>
+    <span class="s-label">${naOpt}</span>
+  </div>`;
+
+  return `<div class="q-accordion" id="qa-${q.id}">
+    <div class="q-acc-head${hasAns?' open':''}" id="qah-${q.id}" onclick="toggleQ('${q.id}')">
+      <span class="q-acc-num">${secNum}.${qi+1}</span>
+      <span class="q-acc-text">${qText}</span>
+      <div class="q-acc-status">
+        <span class="q-score-tag" id="qst-${q.id}" style="${hasAns&&curScore!=='na'?`display:inline;background:${scoreInfo.bg};color:${scoreInfo.color}`:'display:none'}">${hasAns&&curScore!=='na'?scoreInfo.label:''}</span>
+        <div class="q-pillars">${dotHtml}</div>
+        <span class="q-chevron">▾</span>
+      </div>
+    </div>
+    <div class="q-acc-body${hasAns?' open':''}" id="qab-${q.id}">
+      <div class="q-ref-line">${q.ref}</div>
+      <div class="scale-opts">${optsHtml}${naHtml}</div>
+      <div class="q-note-label">${noteLabel}</div>
+      <textarea class="q-note-ta" id="qn-${q.id}" placeholder="${notePh}" onchange="saveNote('${q.id}',this.value)">${curNote}</textarea>
+    </div>
+  </div>`;
+}
+
+function toggleQ(qId){
+  const head=document.getElementById('qah-'+qId);
+  const body=document.getElementById('qab-'+qId);
+  head.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+function selAns(qId, score){
+  if(!answers[qId]) answers[qId]={score:undefined,note:''};
+  answers[qId].score=score;
+
+  const classes=['s0','s1','s2','s3','s4','sna'];
+  [0,1,2,3,4,'na'].forEach(k=>{
+    const el=document.getElementById(`so-${qId}-${k}`);
+    if(el) el.classList.remove('sel');
+  });
+  const sel=document.getElementById(`so-${qId}-${score}`);
+  if(sel) sel.classList.add('sel');
+
+  // Update score tag
+  const tag=document.getElementById('qst-'+qId);
+  if(tag){
+    if(score!=='na'){
+      const si=scoreTag(score);
+      tag.style.display='inline';
+      tag.style.background=si.bg;
+      tag.style.color=si.color;
+      tag.textContent=si.label;
+    } else {
+      tag.style.display='none';
+    }
+  }
+
+  updateSectionProgress(qId);
+  updateProgress();
+  updateSidebarChecks();
+}
+
+function saveNote(qId, val){
+  if(!answers[qId]) answers[qId]={score:undefined,note:''};
+  answers[qId].note=val;
+}
+
+function updateSectionProgress(qId){
+  const sec=SECTIONS.find(s=>s.qs.some(q=>q.id===qId));
+  if(!sec) return;
+  const answered=sec.qs.filter(q=>answers[q.id]?.score!==undefined).length;
+  const lbl=document.getElementById('cplbl-'+sec.id);
+  if(lbl) lbl.textContent=`${answered}/${sec.qs.length} ${lang==='fr'?'questions complétées':'questions completed'}`;
+  const pips=document.getElementById('cppips-'+sec.id);
+  if(pips) pips.innerHTML=sec.qs.map(q=>{
+    const a=answers[q.id];
+    return `<div class="cp-pip${a?.score!==undefined?' done':''}"></div>`;
+  }).join('');
+}
+
+function scoreTag(s){
+  const tags=[
+    {label:lang==='fr'?'Inexistant':'Non-existent',bg:'#fff5f5',color:'#c53030'},
+    {label:lang==='fr'?'Partiel':'Partial',bg:'#fffaf0',color:'#c05621'},
+    {label:lang==='fr'?'En dév.':'Developing',bg:'#fffff0',color:'#b7791f'},
+    {label:lang==='fr'?'Défini':'Defined',bg:'#f0fff4',color:'#276749'},
+    {label:lang==='fr'?'Optimisé':'Optimized',bg:'#ebf8ff',color:'#2b6cb0'},
+  ];
+  return tags[s]||{label:'',bg:'',color:''};
+}
+
+/* ═══════════════════════════════════
+   INSURANCE
+═══════════════════════════════════ */
+function setIns(v){
+  insStatus=v;
+  ['yes','no','unk'].forEach(k=>{
+    const el=document.getElementById('ins-'+k);
+    if(el) el.className='ins-opt'+(v===k?' sel-'+k:'');
+  });
+}
+
+/* ═══════════════════════════════════
+   EMERGENCY CONTACTS
+═══════════════════════════════════ */
+let ecCount=0;
+function buildEmergContacts(){
+  const root=document.getElementById('emerg-contacts');
+  // Default rows
+  const defaults=lang==='fr'
+    ?[{role:'Responsable TI / MSSP'},{role:'Direction / Propriétaire'},{role:'Assureur cyber'},{role:'Conseiller juridique'}]
+    :[{role:'IT Manager / MSSP'},{role:'Management / Owner'},{role:'Cyber Insurer'},{role:'Legal Counsel'}];
+  defaults.forEach(d=>addEmergContact(d.role));
+}
+
+function addEmergContact(defaultRole=''){
+  ecCount++;
+  const id='ec-'+ecCount;
+  const root=document.getElementById('emerg-contacts');
+  const row=document.createElement('div');
+  row.id=id;
+  row.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--rule2)';
+  const roleLbl=lang==='fr'?'Rôle / Titre':'Role / Title';
+  const phoneLbl=lang==='fr'?'Téléphone d\'urgence':'Emergency Phone';
+  const emailLbl='Email';
+  row.innerHTML=`
+    <div class="field"><label>${roleLbl}</label><input type="text" placeholder="${defaultRole||roleLbl}" value="${defaultRole}"></div>
+    <div class="field"><label>${phoneLbl}</label><input type="tel" placeholder="+1 514 000-0000"></div>
+    <div class="field"><label>${emailLbl}</label><input type="email" placeholder="urgence@domaine.com"></div>
+    <button onclick="removeEC('${id}')" style="padding:8px 10px;background:transparent;border:1px solid var(--rule);border-radius:5px;color:var(--slate3);cursor:pointer;font-size:12px;height:36px;align-self:end" title="${lang==='fr'?'Supprimer':'Remove'}">✕</button>`;
+  root.appendChild(row);
+}
+
+function removeEC(id){
+  const el=document.getElementById(id);
+  if(el) el.remove();
+}
+
+/* ═══════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════ */
+function goPage(id){
+  // Hide all
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+
+  const pageId = id.startsWith('ctrl-') ? 'page-ctrl-'+id.replace('ctrl-','') : (id==='report'?'page-report':'page-cover');
+  const pg=document.getElementById(pageId);
+  if(pg){
+    pg.classList.add('active');
+    document.getElementById('main-content').scrollTop=0;
+    window.scrollTo(0,0);
+  }
+
+  // Sidebar active
+  if(id==='cover') document.getElementById('sb-cover')?.classList.add('active');
+  else if(id.startsWith('ctrl-')){
+    const sid='sb-'+id.replace('ctrl-','');
+    document.getElementById(sid)?.classList.add('active');
+  }
+
+  if(id==='report') generateReport();
+}
+
+/* ═══════════════════════════════════
+   PROGRESS
+═══════════════════════════════════ */
+function updateProgress(){
+  const all=SECTIONS.flatMap(s=>s.qs);
+  const done=all.filter(q=>answers[q.id]?.score!==undefined).length;
+  const pct=Math.round(done/all.length*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-txt').textContent=pct+TR[lang].progSfx;
+}
+
+/* ═══════════════════════════════════
+   HELPERS
+═══════════════════════════════════ */
+function pillarCol(p){ return {protect:'var(--protect)',detect:'var(--detect)',respond:'var(--respond)',culture:'var(--culture)'}[p]; }
+function pillarLabel(p){
+  const m={protect:{fr:'PROT.',en:'PROT.'},detect:{fr:'DÉT.',en:'DET.'},respond:{fr:'RÉP.',en:'RES.'},culture:{fr:'CULT.',en:'CULT.'}};
+  return m[p][lang];
+}
+
+/* ═══════════════════════════════════
+   REPORT
+═══════════════════════════════════ */
+function getPillarPct(pillar){
+  const qs=SECTIONS.flatMap(s=>s.qs).filter(q=>q.pillars.includes(pillar));
+  const sc=qs.filter(q=>answers[q.id]?.score!==undefined&&answers[q.id].score!=='na');
+  if(!sc.length) return null;
+  return sc.reduce((a,q)=>a+Number(answers[q.id].score),0)/(sc.length*4)*100;
+}
+
+function matLabel(pct){
+  if(pct===null) return {l:lang==='fr'?'N/D':'N/A',c:'#a0aec0',fr:'Données insuffisantes',en:'Insufficient data'};
+  if(pct<20) return {l:lang==='fr'?'Initial':'Initial',c:'#c53030',fr:'Peu ou pas de contrôles. Vulnérabilité critique.',en:'Few or no controls. Critical vulnerability.'};
+  if(pct<40) return {l:lang==='fr'?'Partiel':'Partial',c:'#c05621',fr:'Contrôles informels ou incomplets.',en:'Informal or incomplete controls.'};
+  if(pct<60) return {l:lang==='fr'?'En développement':'Developing',c:'#b7791f',fr:'Contrôles initiés, non systématiques.',en:'Controls initiated, not systematic.'};
+  if(pct<80) return {l:lang==='fr'?'Défini':'Defined',c:'#276749',fr:'Contrôles documentés et appliqués.',en:'Controls documented and enforced.'};
+  return {l:lang==='fr'?'Optimisé':'Optimized',c:'#2b6cb0',fr:'Maturité avancée, mesurée et améliorée.',en:'Advanced, measured and continuously improved.'};
+}
+
+function generateReport(){
+  const org=document.getElementById('f-org')?.value||(lang==='fr'?'Organisation':'Organization');
+  const date=document.getElementById('f-date')?.value||new Date().toISOString().split('T')[0];
+  const aud=document.getElementById('f-aud')?.value||'';
+  const ref=document.getElementById('f-ref')?.value||'';
+
+  document.getElementById('rpt-eye').textContent=lang==='fr'?'RAPPORT · CONFIDENTIEL':'REPORT · CONFIDENTIAL';
+  document.getElementById('rpt-h1').textContent=lang==='fr'?"Rapport d'Évaluation — Guide CIS PME":'SMB CIS Controls Assessment Report';
+  document.getElementById('rpt-meta').textContent=[org,aud,date,ref].filter(Boolean).join(' · ');
+
+  const pp=getPillarPct('protect'), pd=getPillarPct('detect'), pr=getPillarPct('respond'), pc=getPillarPct('culture');
+  const scores=[pp,pd,pr,pc].filter(s=>s!==null);
+  const overall=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
+  const mat=matLabel(overall);
+
+  const pill=document.getElementById('rpt-pill');
+  pill.style.cssText=`background:${mat.c}18;border-color:${mat.c}44;color:${mat.c}`;
+  pill.innerHTML=`<span style="width:7px;height:7px;border-radius:50%;background:${mat.c};display:inline-block;flex-shrink:0"></span>${mat.l}${overall!==null?' — '+Math.round(overall)+'%':''}&nbsp;&nbsp;<span style="font-size:10px;opacity:.6">${lang==='fr'?mat.fr:mat.en}</span>`;
+
+  const pillarDef=[
+    {k:'protect',fr:'Protéger',en:'Protect',c:'var(--protect)',v:pp},
+    {k:'detect', fr:'Détecter',en:'Detect', c:'var(--detect)', v:pd},
+    {k:'respond',fr:'Répondre',en:'Respond',c:'var(--respond)',v:pr},
+    {k:'culture',fr:'Culture & Gouvernance',en:'Culture & Governance',c:'var(--culture)',v:pc},
+  ];
+  document.getElementById('rpt-grid').innerHTML=pillarDef.map(p=>{
+    const pct=p.v!==null?Math.round(p.v):null;
+    const lv=matLabel(p.v);
+    return `<div class="rpt-cell">
+      <div class="rpt-cell-label" style="color:${p.c}">${lang==='fr'?p.fr:p.en}</div>
+      <div class="rpt-cell-val" style="color:${p.c}">${pct!==null?pct+'%':'—'}</div>
+      <div class="rpt-cell-bar"><div class="rpt-cell-fill" style="width:${pct||0}%;background:${p.c}"></div></div>
+      <div class="rpt-cell-lv" style="color:${lv.c}">${lv.l}</div>
+    </div>`;
+  }).join('');
+
+  buildFindings();
+  document.getElementById('rpt-print').textContent=lang==='fr'?'🖨 Imprimer / PDF':'🖨 Print / PDF';
+  document.getElementById('rpt-csv').textContent=lang==='fr'?'↓ Exporter CSV':'↓ Export CSV';
+  document.getElementById('rpt-reset').textContent=lang==='fr'?'↺ Recommencer':'↺ Start Over';
+  document.getElementById('fc-head').textContent=lang==='fr'?'Observations clés & lacunes prioritaires':'Key Findings & Priority Gaps';
+}
+
+function buildFindings(){
+  const findings=[];
+  const fr=lang==='fr';
+  const chk=(qId,thr,sev,col,tfr,ten)=>{
+    const a=answers[qId];
+    if(a?.score===undefined||a.score==='na') return;
+    if(Number(a.score)<=thr) findings.push({sev,col,text:fr?tfr:ten});
+  };
+  chk('06b',1,fr?'CRITIQUE':'CRITICAL','#c53030','MFA absent ou insuffisant sur les accès distants. Vecteur #1 des compromissions PME.','MFA absent or insufficient on remote access. Top #1 SMB compromise vector.');
+  chk('10d',1,fr?'CRITIQUE':'CRITICAL','#c53030','Sauvegardes non isolées du réseau. Perte totale des données probable en cas de ransomware.','Backups not isolated from network. Total data loss likely in ransomware scenario.');
+  chk('02c',0,fr?'CRITIQUE':'CRITICAL','#c53030','Logiciels en fin de vie sans plan de migration. Vulnérabilités non corrigées exposées.','End-of-life software without migration plan. Unpatched vulnerabilities exposed.');
+  chk('17a',1,fr?'ÉLEVÉ':'HIGH','#c05621','Plan de réponse aux incidents absent ou informel. Pas de capacité de réaction structurée.','Incident response plan absent or informal. No structured response capability.');
+  chk('07a',1,fr?'ÉLEVÉ':'HIGH','#c05621','Gestion des correctifs absente ou informelle. Fenêtre d\'exposition non contrôlée.','Patch management absent or informal. Uncontrolled exposure window.');
+  chk('08b',1,fr?'ÉLEVÉ':'HIGH','#c05621','Journaux non centralisés. Incapacité à détecter, investiguer ou répondre aux incidents.','Logs not centralized. Unable to detect, investigate or respond to incidents.');
+  chk('17d',1,fr?'LÉGAL · LOI 25':'LEGAL · LAW 25','#6c2bd9','Obligations Loi 25 non intégrées au PRI (notification CAI dans les 72h).','Law 25 obligations not in IRP (CAI notification within 72h).');
+  chk('03d',1,fr?'LÉGAL · LOI 25':'LEGAL · LAW 25','#6c2bd9','Politique de rétention des données personnelles absente. Non-conformité Loi 25.','Personal data retention policy absent. Law 25 non-compliance.');
+  chk('14b',1,fr?'MOYEN':'MEDIUM','#b7791f','Aucune formation cybersécurité obligatoire. Risque humain non maîtrisé.','No mandatory cybersecurity training. Unmanaged human risk.');
+  chk('19a',1,fr?'MOYEN · IA':'MEDIUM · AI','#2b6cb0','Aucune politique d\'utilisation de l\'IA. Risque de fuite de données confidentielles.','No AI usage policy. Risk of confidential data leakage.');
+  chk('18a',1,fr?'INFO':'INFO','#718096','Aucun test de pénétration externe réalisé. Vulnérabilités cachées potentielles.','No external penetration test. Potential hidden vulnerabilities.');
+  if(insStatus==='no'||insStatus==='unk') findings.push({sev:fr?'INFO · ASSURANCE':'INFO · INSURANCE',col:'#b45309',text:fr?'Assurance cybersécurité absente ou inconnue. Prévoir une couverture avant le prochain sinistre.':'Cyber insurance absent or unknown. Arrange coverage before the next incident.'});
+  const un=SECTIONS.flatMap(s=>s.qs).filter(q=>!answers[q.id]||answers[q.id].score===undefined).length;
+  if(un>0) findings.push({sev:'INFO',col:'#a0aec0',text:fr?`${un} question(s) sans réponse. Audit complet recommandé.`:`${un} unanswered question(s). Complete audit recommended.`});
+  if(!findings.length) findings.push({sev:fr?'FAVORABLE':'FAVORABLE',col:'#276749',text:fr?'Aucune lacune critique détectée. Maintenir la vigilance et améliorer continuellement.':'No critical gaps detected. Maintain vigilance and continuously improve.'});
+  document.getElementById('fc-body').innerHTML=findings.map(f=>`
+    <div class="fc-row">
+      <span class="fc-badge" style="background:${f.col}18;color:${f.col};border-color:${f.col}33">${f.sev}</span>
+      <div class="fc-text">${f.text}</div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════
+   PRINT PANEL
+═══════════════════════════════════ */
+function togglePrintPanel(){
+  const p=document.getElementById('print-panel');
+  const b=document.getElementById('print-toggle-btn');
+  p.classList.toggle('show');
+  b.classList.toggle('on');
+  updatePrintPanelLabels();
+}
+
+function updatePrintPanelLabels(){
+  const fr=lang==='fr';
+  document.getElementById('pp-title').textContent=fr?"Options d'impression":"Print Options";
+  document.getElementById('pp-all-lbl').textContent=fr?"Imprimer tous les contrôles":"Print all controls";
+  document.getElementById('pp-notes-lbl').textContent=fr?"Inclure les notes":"Include notes";
+  document.getElementById('pp-scale-lbl').textContent=fr?"Inclure les options de réponse":"Include answer options";
+  document.getElementById('pp-btn').textContent=fr?"🖨 Imprimer / Exporter PDF":"🖨 Print / Export PDF";
+}
+
+function toggleOpt(key){
+  printOpts[key]=!printOpts[key];
+  const tog=document.getElementById('tog-'+key);
+  if(tog) tog.classList.toggle('on', printOpts[key]);
+}
+
+function doPrint(){
+  // Open all sections if print-all
+  if(printOpts.all){
+    document.body.classList.add('print-all');
+    SECTIONS.forEach(sec=>{
+      sec.qs.forEach(q=>{
+        document.getElementById('qab-'+q.id)?.classList.add('open');
+      });
+    });
+  }
+  document.body.classList.toggle('print-hide-notes',!printOpts.notes);
+  document.body.classList.toggle('print-hide-scale',!printOpts.scale);
+  document.getElementById('print-panel').classList.remove('show');
+  document.getElementById('print-toggle-btn').classList.remove('on');
+  setTimeout(()=>{
+    window.print();
+    // Restore
+    document.body.classList.remove('print-all','print-hide-notes','print-hide-scale');
+  },200);
+}
+
+/* ═══════════════════════════════════
+   EXPORT CSV
+═══════════════════════════════════ */
+function doExportCSV(){
+  const org=document.getElementById('f-org')?.value||'N/A';
+  const date=document.getElementById('f-date')?.value||'';
+  const aud=document.getElementById('f-aud')?.value||'';
+  const opts=TR[lang].opts;
+  const hdr=(lang==='fr'
+    ?['Organisation','Auditeur','Date','Domaine CIS','Réf CIS','Piliers','Question','Score','Niveau','Notes']
+    :['Organization','Auditor','Date','CIS Domain','CIS Ref','Pillars','Question','Score','Level','Notes']).join(',');
+  const rows=[hdr];
+  SECTIONS.forEach(sec=>{
+    const secTitle=(lang==='fr'?sec.fr.title:sec.en.title).replace(/"/g,'""');
+    sec.qs.forEach(q=>{
+      const a=answers[q.id];
+      const score=a?(a.score==='na'?'N/A':a.score??''):'';
+      const level=(a&&a.score!=='na'&&a.score!==undefined)?opts[a.score]:'';
+      const note=(a?.note||'').replace(/"/g,'""');
+      const qText=(lang==='fr'?q.fr:q.en).replace(/"/g,'""');
+      const pillars=q.pillars.join(';');
+      rows.push([`"${org}"`,`"${aud}"`,`"${date}"`,`"${secTitle}"`,`"${q.ref}"`,`"${pillars}"`,`"${qText}"`,`"${score}"`,`"${level}"`,`"${note}"`].join(','));
+    });
+  });
+  const blob=new Blob(['\uFEFF'+rows.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`cis-assessment-${org.replace(/\s+/g,'-')}-${date||'draft'}.csv`;
+  a.click();
+}
+
+function doReset(){
+  if(!confirm(lang==='fr'?'Réinitialiser toutes les réponses?':'Reset all answers?')) return;
+  answers={};
+  insStatus='';
+  setIns('');
+  buildCtrlPages();
+  updateProgress();
+  updateSidebarChecks();
+  goPage('cover');
+}
+
+/* ═══════════════════════════════════
+   LANG SWITCH
+═══════════════════════════════════ */
+const staticLabels={
+  fr:{'tb-title':"Guide d'Évaluation des PMEs",'tb-doc':'PME Québec · Contrôle CIS v8.1 + IA · Loi 25','sb-lbl-nav':'Navigation','sb-lbl-ctrl':'Contrôles CIS','sb-home-lbl':'Accueil & Info','sb-rpt-lbl':'Générer le rapport','cv-eye':"GUIDE D'ÉVALUATION · PME QUÉBEC · CONFIDENTIEL",'cv-h1':"Guide d'Évaluation des PMEs<br><em>Contrôle CIS v8.1</em>",'cv-desc':"Guide d'évaluation fondé sur les 18 Contrôles CIS v8.1 + sécurité IA, adapté aux PME québécoises. Conçu pour l'auditeur ou l'organisation elle-même.",'cv-t1':'Loi 25 · Vie privée','cv-t2':'Sécurité IA','cv-t3':'Cadre PDRP','cv-t4':'PME Québec','pl1':'Protéger','pl2':'Détecter','pl3':'Répondre','pl4':'Culture & Gouvernance','ch-org':'Informations sur l\'organisation','lbl-org':'Nom de l\'organisation','lbl-sec':'Secteur d\'activité','lbl-size':'Nombre d\'employés','lbl-infra':'Infrastructure principale','lbl-date':'Date de l\'évaluation','lbl-aud':'Évaluateur / Auditeur','lbl-rprp':'Resp. protection données (Loi 25)','lbl-ref':'No. de référence / dossier','lbl-scope':'Portée / périmètre','ch-ins':'Assurance cybersécurité','lbl-ins':'L\'organisation dispose-t-elle d\'une assurance cybersécurité?','ins-yes-lbl':'✓ Oui','ins-no-lbl':'✗ Non','ins-unk-lbl':'? Inconnu','lbl-insurer':'Assureur / courtier','lbl-coverage':'Couverture (montant / type)','lbl-policy':'Numéro de police','lbl-renewal':'Date de renouvellement','lbl-deductible':'Franchise / Déductible','lbl-notif':'Délai de notification assureur','lbl-ins-notes':'Notes / conditions particulières','ch-emerg':'Contacts d\'urgence','add-contact-lbl':'Ajouter un contact d\'urgence','start-btn':'Commencer le guide →','ls-name':"Guide d'Évaluation des PMEs",'ls-s1':'DOMAINES','ls-s2':'QUESTIONS','ls-s3':'PILIERS','ls-enter-txt':'OUVRIR LE GUIDE →'},
+  en:{'tb-title':'SMB CIS Controls Assessment Guide','tb-doc':'Québec SMB · CIS Controls v8.1 + AI · Law 25','sb-lbl-nav':'Navigation','sb-lbl-ctrl':'CIS Controls','sb-home-lbl':'Home & Info','sb-rpt-lbl':'Generate Report','cv-eye':'SMB ASSESSMENT GUIDE · QUÉBEC · CONFIDENTIAL','cv-h1':'SMB CIS Controls<br><em>Assessment Guide</em>','cv-desc':'Assessment guide based on 18 CIS Controls v8.1 + AI security, tailored for Québec SMBs. Designed for auditors or the organization itself.','cv-t1':'Law 25 · Privacy','cv-t2':'AI Security','cv-t3':'PDRP Framework','cv-t4':'Québec SMB','pl1':'Protect','pl2':'Detect','pl3':'Respond','pl4':'Culture & Governance','ch-org':'Organization Information','lbl-org':'Organization Name','lbl-sec':'Industry Sector','lbl-size':'Number of Employees','lbl-infra':'Primary Infrastructure','lbl-date':'Assessment Date','lbl-aud':'Assessor / Auditor','lbl-rprp':'Data Protection Officer (Law 25)','lbl-ref':'Reference / File Number','lbl-scope':'Assessment Scope','ch-ins':'Cyber Insurance','lbl-ins':'Does the organization have cyber insurance?','ins-yes-lbl':'✓ Yes','ins-no-lbl':'✗ No','ins-unk-lbl':'? Unknown','lbl-insurer':'Insurer / Broker','lbl-coverage':'Coverage (amount / type)','lbl-policy':'Policy Number','lbl-renewal':'Renewal Date','lbl-deductible':'Deductible','lbl-notif':'Insurer notification deadline','lbl-ins-notes':'Notes / special policy conditions','ch-emerg':'Emergency Contacts','add-contact-lbl':'Add emergency contact','start-btn':'Start Guide →','ls-name':'SMB CIS Controls Assessment','ls-s1':'DOMAINS','ls-s2':'QUESTIONS','ls-s3':'PILLARS','ls-enter-txt':'OPEN GUIDE →'},
+};
+
+function setLang(l){
+  lang=l;
+  document.getElementById('btn-fr').classList.toggle('on',l==='fr');
+  document.getElementById('btn-en').classList.toggle('on',l==='en');
+  document.documentElement.lang=l;
+  document.getElementById('ls-h1').innerHTML=l==='fr'?"Guide d'Évaluation<br><em>des PMEs — Contrôle CIS</em>":'SMB CIS Controls<br><em>Assessment Guide</em>';
+  document.getElementById('ls-sub').textContent=l==='fr'?'PME QUÉBEC · CONTRÔLE CIS v8.1 + IA':'QUÉBEC SMB · CIS CONTROLS v8.1 + AI';
+  document.getElementById('ls-sub2').textContent=l==='fr'?'CONTRÔLE CIS v8.1 · IA · LOI 25 · CADRE PDRP':'CIS CONTROLS v8.1 · AI · LAW 25 · PDRP FRAMEWORK';
+  Object.entries(staticLabels[l]).forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    if(['cv-h1'].includes(id)) el.innerHTML=val;
+    else el.textContent=val;
+  });
+  buildSidebar();
+  buildCtrlPages();
+  updatePrintPanelLabels();
+  updateProgress();
+}
+
+/* ═══════════════════════════════════
+   INIT
+═══════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', runLoader);
+</script>
+</body>
+</html>
