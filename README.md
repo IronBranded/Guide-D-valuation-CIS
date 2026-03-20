@@ -214,6 +214,7 @@ N/A answers are excluded from both numerator and denominator. The overall score 
 ## Contribuer / Contributing
 
 Les contributions sont les bienvenues. / Contributions are welcome.
+
 ---
 
 <div align="center">
